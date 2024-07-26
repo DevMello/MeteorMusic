@@ -1,7 +1,6 @@
 package com.devmello.music;
 
 import com.devmello.music.commands.*;
-import com.devmello.music.hud.HudExample;
 import com.devmello.music.hud.MusicImage;
 import com.devmello.music.modules.ModuleExample;
 import com.devmello.music.util.YoutubeExecutor;
@@ -62,7 +61,6 @@ public class MusicPlugin extends MeteorAddon {
         Commands.add(new RepeatCommand());
 
         // HUD
-        Hud.get().register(HudExample.INFO);
         Hud.get().register(MusicImage.INFO);
 
         //TAB TEST

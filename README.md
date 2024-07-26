@@ -1,7 +1,7 @@
 # Meteor Music
 A music addon for Meteor. Allows you to play music in-game.
 Currently only works with commands like .play. Will be updated to work with the HUD.
-uhh sadly only works on windows for now. I will try to make it work on linux and mac in the future. feel free to create a pr if you do it yourself
+Only tested on windows. Mac and Linux has been implemented but not tested. If you have any issues please create an issue.
 ## Features
 - Play music from YouTube.
 - Pause, resume, and stop the current song.
@@ -9,7 +9,7 @@ uhh sadly only works on windows for now. I will try to make it work on linux and
 
 ## Requirements
 - [Meteor](https://meteorclient.com/)
-- ffmpeg in the meteor-client/music folder 💀💀 (auto download support in the future)
+- ffmpeg in the meteor-client/music folder for mac and linux 💀💀 (windows automatically installed)
 - yt-dlp. not necessary but if you have some crazy fork then just place it in the meteor-client/music folder (otherwise automatically installed and updated)
 ## Commands
 - .play <url> - Plays a song from a URL.

@@ -22,18 +22,24 @@ public class YoutubeExecutor {
     public static final String MAC_URL = "https://github.com/yt-dlp/yt-dlp/releases/download/2024.07.25/yt-dlp_macos";
     public static final String FFMPEG_URL = "https://raw.githubusercontent.com/devmello/MeteorMusic/master/utils/ffmpeg.exe";
     public static String exec = MusicPlugin.FOLDER + File.separator + "yt-dlp" + (os.contains("win") ? ".exe" : "");
-    private Search currentSearch;
-
+    public static Search currentSearch;
     public YoutubeExecutor() {
     }
 
 
-    public void makeSearch(String query){
+    public static Search search(String query){
+        Search currentSearch;
         Gson gson = new Gson();
-        this.currentSearch = gson.fromJson(WebUtils.visitSite("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q="
+        currentSearch = gson.fromJson(WebUtils.visitSite("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q="
             + query.replace(" ", "%20")
             + "&type=video&key="+MusicPlugin.api_key), Search.class);
+        currentSearch.getItems().forEach(item -> LOG.info(item.getSnippet().getTitle()));
+        LOG.info("Search made");
+        LOG.info(gson.toString());
+        YoutubeExecutor.currentSearch = currentSearch;
+        return currentSearch;
     }
+
 
     public static boolean download(String url) {
         //\yt-dlp.exe -x --audio-format mp3 --force-overwrites -o "music.%(ext)s" url

@@ -50,7 +50,9 @@ public class MusicPlugin extends MeteorAddon {
         Modules.get().add(new ModuleExample());
 
         // Commands
+        Commands.add(new ListCommand());
         Commands.add(new CommandExample());
+        Commands.add(new SearchCommand());
         Commands.add(new MusicCommand());
         Commands.add(new UpdateCommand());
         Commands.add(new PlayCommand());
@@ -61,7 +63,7 @@ public class MusicPlugin extends MeteorAddon {
         Commands.add(new RepeatCommand());
 
         // HUD
-        Hud.get().register(MusicImage.INFO);
+        //Hud.get().register(MusicImage.INFO);
 
         //TAB TEST
         Tabs.add(new MusicTab());

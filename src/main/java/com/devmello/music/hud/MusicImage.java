@@ -24,51 +24,42 @@ import java.net.URL;
 
 public class MusicImage extends HudElement {
     public static final HudElementInfo<MusicImage> INFO = new HudElementInfo<>(MusicPlugin.HUD_GROUP, "Song Image", "The thumbnail of the song.", MusicImage::new);
-    MinecraftClient client = MinecraftClient.getInstance();
-    TextureManager textureManager = client.getTextureManager();
-
-    private static NativeImageBackedTexture texture;
-    private static Identifier textureId = new Identifier("music", "dynamic_texture.png");
+    //private static final Identifier textureId = new Identifier("music", "music.png");
 
     public MusicImage() {
         super(INFO);
 
     }
-
-    public static void loadImageFromUrl(String urlString) {
-        new Thread(() -> {
-            try {
-                URL url = new URL(urlString);
-                LogUtils.getLogger().info("Loading image from: {}", urlString);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.connect();
-                LogUtils.getLogger().info("Connected to URL");
-
-                try (InputStream inputStream = connection.getInputStream()) {
-                    LogUtils.getLogger().info("loaded image from URL");
-                    NativeImage nativeImage = NativeImage.read(inputStream);
-                    LogUtils.getLogger().info("Image loaded");
-                    MinecraftClient client = MinecraftClient.getInstance();
-                    if (texture != null) {
-                        client.getTextureManager().destroyTexture(textureId);
-                    }
-                    texture = new NativeImageBackedTexture(nativeImage);
-                    client.getTextureManager().registerTexture(textureId, texture);
-
-                }
-            } catch (IOException e) {
-                LogUtils.getLogger().error("Failed to load image from URL", e);
-            }
-        }).start();
-    }
+//
+//    public static void loadImageFromUrl(String urlString) {
+//        new Thread(() -> {
+//            try {
+//                URL url = new URL(urlString);
+//                LogUtils.getLogger().info("Loading image from: {}", urlString);
+//                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//                connection.setRequestMethod("GET");
+//                connection.connect();
+//                LogUtils.getLogger().info("Connected to URL");
+//
+//                try (InputStream inputStream = connection.getInputStream()) {
+//                    LogUtils.getLogger().info("loaded image from URL");
+//                    NativeImage nativeImage = NativeImage.read(inputStream);
+//                    LogUtils.getLogger().info("Image loaded");
+//                    MinecraftClient client = MinecraftClient.getInstance();
+//                    client.getTextureManager().registerTexture(textureId, new NativeImageBackedTexture(nativeImage));
+//                }
+//            } catch (IOException e) {
+//                LogUtils.getLogger().error("Failed to load image from URL", e);
+//            }
+//        }).start();
+//    }
 
     @Override
     public void render(HudRenderer renderer) {
 //        Identifier texture = new Identifier("music", "icon.png");
         setSize(256, 144);
 
-        renderer.texture(textureId, x, y, getWidth(), getHeight(), Color.WHITE);
+        //renderer.texture(textureId, x, y, getWidth(), getHeight(), Color.WHITE);
 
 //        // Render background
 //        renderer.quad(x, y, getWidth(), getHeight(), Color.LIGHT_GRAY);

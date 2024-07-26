@@ -1,6 +1,7 @@
 package com.devmello.music.commands;
 
 import com.devmello.music.MusicPlugin;
+import com.devmello.music.hud.MusicImage;
 import com.devmello.music.player.Player;
 import com.devmello.music.util.YoutubeExecutor;
 import com.devmello.music.youtube.search.Search;
@@ -44,6 +45,9 @@ public class PlayCommand extends Command {
             info("Playing: " + url);
 
             // Asynchronous task for downloading so we don't freeze minecraft gaming experience
+            //get the video ID for the thumbnail
+            LOG.info(YoutubeExecutor.extractVideoId(url));
+            MusicImage.loadImageFromID(YoutubeExecutor.extractVideoId(url));
             Future<Boolean> future = executorService.submit(() -> YoutubeExecutor.download(url));
 
             executorService.submit(() -> {

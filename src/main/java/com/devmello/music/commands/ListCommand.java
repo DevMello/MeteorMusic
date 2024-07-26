@@ -52,7 +52,7 @@ public class ListCommand extends Command {
             Player.stop();
             String url = "https://www.youtube.com/watch?v=" + search.getItems().get(number).getId().getVideoId();
             MusicImage.loadImageFromUrl(search.getItems().get(number).getSnippet().getThumbnails().getDefault().getUrl());
-            LOG.info(search.getItems().get(number).getSnippet().getThumbnails().getDefault().getUrl());
+            LOG.info(search.getItems().get(number).getSnippet().getThumbnails().getHigh().getUrl());
 
             LOG.info("Playing: {}", url);
             info("Playing: " + url);

@@ -1,5 +1,6 @@
 package com.devmello.music.hud;
 
+import com.devmello.music.util.YoutubeExecutor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.systems.hud.HudElement;
@@ -31,6 +32,10 @@ public class MusicImage extends HudElement {
     public MusicImage() {
         super(INFO);
 
+    }
+
+    public static void loadImageFromID(String id) {
+        loadImageFromUrl("https://i.ytimg.com/vi/" + YoutubeExecutor.extractVideoId(id) + "/hqdefault.jpg");
     }
 
     public static void loadImageFromUrl(String urlString) {

@@ -68,6 +68,7 @@ public class MusicPlugin extends MeteorAddon {
         Commands.add(new PauseCommand());
         Commands.add(new StopCommand());
         Commands.add(new VolumeCommand());
+        Commands.add(new RepeatCommand());
 
         // HUD
         Hud.get().register(HudExample.INFO);

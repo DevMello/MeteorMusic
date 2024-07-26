@@ -1,3 +1,34 @@
+# Meteor Music
+A music addon for Meteor. Allows you to play music in-game.
+Currently only works with commands like .play. Will be updated to work with the HUD.
+
+## Features
+- Play music from YouTube.
+- Pause, resume, and stop the current song.
+- Set the volume of the current song.
+
+## Requirements
+- [Meteor](https://meteorclient.com/)
+- ffmpeg in the meteor-clinet/music folder 💀💀 (auto download support in the future)
+- yt-dlp. not necessary but if you have some crazy fork then just place it in the meteor-client/music folder (otherwise automatically installed and updated)
+## Commands
+- .play <url> - Plays a song from a URL.
+- .stop - Stops the current song.
+- .pause - Pauses the current song.
+- .resume - Resumes the current song.
+- .volume <volume> - Sets the volume of the current song.
+- .update - Updates yt-dlp.
+
+## Installation
+- Download the latest release from the releases page.
+- Place the jar in the addons folder of your Meteor installation.
+- Start Meteor.
+
+## Building
+- Clone the repository.
+- Run `./gradlew build` to build the jar.
+- The jar will be in `build/libs`.
+
 # Meteor Addon Template
 
 A template to allow easy usage of the Meteor Addon API.

@@ -63,7 +63,7 @@ public class MusicPlugin extends MeteorAddon {
         Commands.add(new RepeatCommand());
 
         // HUD
-        //Hud.get().register(MusicImage.INFO);
+        Hud.get().register(MusicImage.INFO);
 
         //TAB TEST
         Tabs.add(new MusicTab());

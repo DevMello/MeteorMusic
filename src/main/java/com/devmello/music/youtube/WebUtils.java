@@ -19,7 +19,7 @@ public class WebUtils {
 
     public static String agent1 = "User-Agent";
     public static final Logger logger = LogUtils.getLogger();
-    public static String agent2 = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36";
+    public static String agent2 = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0";
     public static boolean launchedFromOfficalLauncher;
     public static String visitSiteThreaded(final String urly){
         final List<String> lines = new ArrayList<String>();
@@ -156,7 +156,7 @@ public class WebUtils {
         return stuff;
 
     }
-    
+
 
 
 }

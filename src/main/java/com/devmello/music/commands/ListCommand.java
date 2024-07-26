@@ -1,6 +1,7 @@
 package com.devmello.music.commands;
 
 import com.devmello.music.MusicPlugin;
+import com.devmello.music.hud.MusicImage;
 import com.devmello.music.player.Player;
 import com.devmello.music.util.YoutubeExecutor;
 import com.devmello.music.youtube.search.Search;
@@ -50,6 +51,9 @@ public class ListCommand extends Command {
             //release windows file handle lock to allow deletion
             Player.stop();
             String url = "https://www.youtube.com/watch?v=" + search.getItems().get(number).getId().getVideoId();
+            MusicImage.loadImageFromUrl(search.getItems().get(number).getSnippet().getThumbnails().getDefault().getUrl());
+            LOG.info(search.getItems().get(number).getSnippet().getThumbnails().getDefault().getUrl());
+
             LOG.info("Playing: {}", url);
             info("Playing: " + url);
             Future<Boolean> future = executorService.submit(() -> YoutubeExecutor.download(url));

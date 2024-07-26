@@ -46,8 +46,8 @@ public class PlayCommand extends Command {
 
             // Asynchronous task for downloading so we don't freeze minecraft gaming experience
             //get the video ID for the thumbnail
-            LOG.info(YoutubeExecutor.extractVideoId(url));
-            MusicImage.loadImageFromID(YoutubeExecutor.extractVideoId(url));
+            LOG.info(YoutubeExecutor.extractVideoID(url));
+            MusicImage.loadImageFromID(YoutubeExecutor.extractVideoID(url));
             Future<Boolean> future = executorService.submit(() -> YoutubeExecutor.download(url));
 
             executorService.submit(() -> {

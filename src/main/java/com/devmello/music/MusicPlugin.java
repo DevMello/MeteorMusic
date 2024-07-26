@@ -2,7 +2,6 @@ package com.devmello.music;
 
 import com.devmello.music.commands.*;
 import com.devmello.music.hud.MusicImage;
-import com.devmello.music.modules.ModuleExample;
 import com.devmello.music.util.YoutubeExecutor;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.MeteorClient;
@@ -47,7 +46,7 @@ public class MusicPlugin extends MeteorAddon {
 
 
         // Modules
-        Modules.get().add(new ModuleExample());
+//        Modules.get().add(new ModuleExample());
 
         // Commands
         Commands.add(new ListCommand());
@@ -67,11 +66,6 @@ public class MusicPlugin extends MeteorAddon {
 
         //TAB TEST
         Tabs.add(new MusicTab());
-    }
-
-    @Override
-    public void onRegisterCategories() {
-        Modules.registerCategory(CATEGORY);
     }
 
     @Override

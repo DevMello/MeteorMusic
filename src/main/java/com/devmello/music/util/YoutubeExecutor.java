@@ -13,6 +13,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,36 +28,29 @@ public class YoutubeExecutor {
     public static final String FFMPEG_URL = "https://raw.githubusercontent.com/devmello/MeteorMusic/master/utils/ffmpeg.exe";
     public static String exec = MusicPlugin.FOLDER + File.separator + "yt-dlp" + (os.contains("win") ? ".exe" : "");
     public static Search currentSearch;
-    private static final Pattern YOUTUBE_WATCH_PATTERN = Pattern.compile(
-        "^(?:https?:\\/\\/)?(?:www\\.)?youtube\\.com\\/watch\\?v=([^&%\\s]+)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern YOUTUBE_SHORTENED_PATTERN = Pattern.compile(
-        "^(?:https?:\\/\\/)?(?:www\\.)?youtu\\.be\\/([^&%\\s]+)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern YOUTUBE_EMBED_PATTERN = Pattern.compile(
-        "^(?:https?:\\/\\/)?(?:www\\.)?youtube\\.com\\/embed\\/([^&%\\s]+)", Pattern.CASE_INSENSITIVE);
+
     public YoutubeExecutor() {
     }
 
-    public static String extractVideoId(String url) {
-        if (url == null || url.isEmpty()) {
-            return null;
+    public static String extractVideoID(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            String query = url.getQuery();
+            if (query != null) {
+                Map<String, String> queryPairs = new HashMap<>();
+                String[] pairs = query.split("&");
+                for (String pair : pairs) {
+                    int idx = pair.indexOf("=");
+                    if (idx > 0) {
+                        queryPairs.put(pair.substring(0, idx), URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+                    }
+                }
+                return queryPairs.get("v");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        Matcher matcher = YOUTUBE_WATCH_PATTERN.matcher(url);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-
-        matcher = YOUTUBE_SHORTENED_PATTERN.matcher(url);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-
-        matcher = YOUTUBE_EMBED_PATTERN.matcher(url);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-
-        return null; // URL does not match any known YouTube format
+        return null;
     }
 
 

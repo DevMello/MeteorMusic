@@ -35,7 +35,7 @@ public class MusicImage extends HudElement {
     }
 
     public static void loadImageFromID(String id) {
-        loadImageFromUrl("https://i.ytimg.com/vi/" + YoutubeExecutor.extractVideoId(id) + "/hqdefault.jpg");
+        loadImageFromUrl("https://i.ytimg.com/vi/" + YoutubeExecutor.extractVideoID(id) + "/hqdefault.jpg");
     }
 
     public static void loadImageFromUrl(String urlString) {

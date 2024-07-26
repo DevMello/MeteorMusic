@@ -3,6 +3,9 @@ package com.devmello.music.hud;
 import com.devmello.music.util.YoutubeExecutor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
+import meteordevelopment.meteorclient.settings.EnumSetting;
+import meteordevelopment.meteorclient.settings.Setting;
+import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.hud.HudElement;
 
 import com.devmello.music.MusicPlugin;
@@ -29,13 +32,23 @@ public class MusicImage extends HudElement {
     public static final HudElementInfo<MusicImage> INFO = new HudElementInfo<>(MusicPlugin.HUD_GROUP, "Song Image", "The thumbnail of the song.", MusicImage::new);
     private static final Identifier textureId = new Identifier("music", "music.png");
 
+    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+
+
+    public final Setting<ImageSize> imageSize = sgGeneral.add(new EnumSetting.Builder<ImageSize>()
+        .name("image-size")
+        .description("The size of the image.")
+        .defaultValue(ImageSize.SMALL)
+        .build());
+
     public MusicImage() {
         super(INFO);
-
     }
 
+
+
     public static void loadImageFromID(String id) {
-        loadImageFromUrl("https://i.ytimg.com/vi/" + YoutubeExecutor.extractVideoID(id) + "/hqdefault.jpg");
+        loadImageFromUrl("https://i.ytimg.com/vi/" + id + "/hqdefault.jpg");
     }
 
     public static void loadImageFromUrl(String urlString) {
@@ -70,16 +83,24 @@ public class MusicImage extends HudElement {
 
     @Override
     public void render(HudRenderer renderer) {
-//        Identifier texture = new Identifier("music", "icon.png");
-        setSize(120, 90);
-
+        setSize(imageSize.get().width, imageSize.get().height);
+        if (MinecraftClient.getInstance().getTextureManager().getTexture(textureId) == null) return;
+        //renderer.texture(textureId, x, y, imageSize.get().width, imageSize.get().height, Color.WHITE);
         renderer.texture(textureId, x, y, getWidth(), getHeight(), Color.WHITE);
+    }
 
-//        // Render background
-//        renderer.quad(x, y, getWidth(), getHeight(), Color.LIGHT_GRAY);
-//
-//        // Render text
-//        renderer.text("Example element", x, y, Color.WHITE, true);
+    public enum ImageSize {
+        SMALL(120, 90),
+        MEDIUM(240, 180),
+        LARGE(480, 360);
+
+        public final int width;
+        public final int height;
+
+        ImageSize(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
     }
 }
 

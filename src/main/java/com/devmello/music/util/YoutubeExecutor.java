@@ -110,10 +110,8 @@ public class YoutubeExecutor {
             }
             URL url = new URL(link);
             HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-
             int responseCode = httpConn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-
                 InputStream inputStream = httpConn.getInputStream();
                 String fileName = "yt-dlp" + (os.contains("win") ? ".exe" : "");
                 String saveFilePath = MusicPlugin.FOLDER + File.separator + fileName;
@@ -129,9 +127,7 @@ public class YoutubeExecutor {
             } else {
                 LOG.error("No file to download. Server replied HTTP code: " + responseCode);
             }
-
             httpConn.disconnect();
-
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -156,19 +152,17 @@ public class YoutubeExecutor {
         try {
             URL url = new URL(FFMPEG_URL);
             HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-
             int responseCode = httpConn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-
                 InputStream inputStream = httpConn.getInputStream();
-                String fileName = "ffmpeg.exe";
-                String saveFilePath = MusicPlugin.FOLDER + File.separator + fileName;
+                String saveFilePath = MusicPlugin.FOLDER + File.separator + "ffmpeg.exe";
                 OutputStream outputStream = new FileOutputStream(saveFilePath);
                 byte[] buffer = new byte[4096];
                 int bytesRead = -1;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, bytesRead);
                 }
+                LOG.info(outputStream.toString());
                 outputStream.close();
                 inputStream.close();
                 LOG.info("File downloaded");

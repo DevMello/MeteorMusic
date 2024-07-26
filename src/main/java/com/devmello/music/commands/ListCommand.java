@@ -51,7 +51,7 @@ public class ListCommand extends Command {
             //release windows file handle lock to allow deletion
             Player.stop();
             String url = "https://www.youtube.com/watch?v=" + search.getItems().get(number).getId().getVideoId();
-            MusicImage.loadImageFromUrl(search.getItems().get(number).getSnippet().getThumbnails().getDefault().getUrl());
+            MusicImage.loadImageFromUrl(search.getItems().get(number).getSnippet().getThumbnails().getHigh().getUrl());
             LOG.info(search.getItems().get(number).getSnippet().getThumbnails().getHigh().getUrl());
 
             LOG.info("Playing: {}", url);

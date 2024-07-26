@@ -18,7 +18,9 @@ import meteordevelopment.meteorclient.gui.tabs.Tabs;
 import org.slf4j.Logger;
 import com.devmello.music.gui.MusicTab;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 
 public class MusicPlugin extends MeteorAddon {
     public static final Logger LOG = LogUtils.getLogger();
@@ -31,31 +33,19 @@ public class MusicPlugin extends MeteorAddon {
     public void onInitialize() {
         LOG.info("Initializing Meteor Music Addon - DevMello");
 
-        if (!MusicPlugin.FOLDER.exists()) {
-            LOG.warn("Plugin folder does not exist, creating...");
-            if (!MusicPlugin.FOLDER.mkdirs()) {
-                LOG.error("Failed to create plugin folder.");
-            } else {
-                LOG.info("Plugin folder created.");
-            }
+        if(!folderCheck()) {
+            LOG.error("Failed to create plugin folder.");
+            return;
         }
 
-        if (YoutubeExecutor.checkInstall()) {
-            LOG.info("yt-dlp installation found.");
-            LOG.info("Attempting to update yt-dlp.");
-            if (YoutubeExecutor.install()) {
-                LOG.info("yt-dlp updated.");
-            } else {
-                LOG.error("Failed to update yt-dlp.");
-            }
+        if(initFFMPEG() && initYTDL()) {
+            LOG.info("Initialization complete.");
         } else {
-            LOG.warn("yt-dlp not installed, installing...");
-            if (YoutubeExecutor.install()) {
-                LOG.info("yt-dlp installed.");
-            } else {
-                LOG.error("Failed to install yt-dlp.");
-            }
+            LOG.error("Initialization failed.");
+            return;
         }
+
+
         // Modules
         Modules.get().add(new ModuleExample());
 
@@ -89,6 +79,93 @@ public class MusicPlugin extends MeteorAddon {
 
     @Override
     public GithubRepo getRepo() {
-        return new GithubRepo("DevMello", "meteor-music");
+        return new GithubRepo("DevMello", "MeteorMusic");
+    }
+
+    public boolean initYTDL(){
+        if (YoutubeExecutor.checkInstall()) {
+            LOG.info("yt-dlp installation found.");
+            LOG.info("Attempting to update yt-dlp.");
+            if (YoutubeExecutor.update()) {
+                LOG.info("yt-dlp updated.");
+                return true;
+            } else {
+                LOG.error("Failed to update yt-dlp.");
+                return false;
+            }
+        } else {
+            LOG.warn("yt-dlp not installed, installing...");
+            if (YoutubeExecutor.install()) {
+                LOG.info("yt-dlp installed.");
+                LOG.info("Attempting to update yt-dlp.");
+                if (YoutubeExecutor.update()) {
+                    LOG.info("yt-dlp updated.");
+                } else {
+                    LOG.error("Failed to update yt-dlp.");
+                }
+                return true;
+            } else {
+                LOG.error("Failed to install yt-dlp.");
+                return false;
+            }
+        }
+    }
+
+    public boolean initFFMPEG() {
+        if (YoutubeExecutor.os.contains("win")) {
+            if (!new File(MusicPlugin.FOLDER, "ffmpeg.exe").exists()) {
+                LOG.warn("ffmpeg not installed, installing...");
+                if (YoutubeExecutor.installFFMPEG()) {
+                    LOG.info("ffmpeg installed.");
+                    return true;
+                } else {
+                    LOG.error("Failed to install ffmpeg.");
+                    return false;
+                }
+            } else {
+                LOG.info("ffmpeg is installed.");
+                return true;
+            }
+        } else {
+            String command = "ffmpeg -version";
+            ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
+            processBuilder.redirectErrorStream(true);
+            try {
+                Process process = processBuilder.start();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    LOG.info(line);
+                }
+
+                int exitCode = process.waitFor();
+                if (exitCode == 0) {
+                    LOG.info("ffmpeg is installed.");
+                    return true;
+                } else {
+                    LOG.error("ffmpeg is not installed, install it yourself.");
+                    return false;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                LOG.error("Failed to check ffmpeg installation.");
+                return false;
+            }
+        }
+    }
+
+    public boolean folderCheck() {
+        if (!MusicPlugin.FOLDER.exists()) {
+            LOG.warn("Plugin folder does not exist, creating...");
+            if (!MusicPlugin.FOLDER.mkdirs()) {
+                LOG.error("Failed to create plugin folder.");
+                return false;
+            } else {
+                LOG.info("Plugin folder created.");
+                return true;
+            }
+        }
+        return MusicPlugin.FOLDER.exists();
     }
 }

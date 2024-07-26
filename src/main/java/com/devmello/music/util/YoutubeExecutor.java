@@ -17,6 +17,7 @@ public class YoutubeExecutor {
     public static final String WINDOWS_URL = "https://github.com/yt-dlp/yt-dlp/releases/download/2024.07.25/yt-dlp.exe";
     public static final String LINUX_URL = "https://github.com/yt-dlp/yt-dlp/releases/download/2024.07.25/yt-dlp_linux";
     public static final String MAC_URL = "https://github.com/yt-dlp/yt-dlp/releases/download/2024.07.25/yt-dlp_macos";
+    public static final String FFMPEG_URL = "https://raw.githubusercontent.com/devmello/MeteorMusic/master/utils/ffmpeg.exe";
     public static String exec = MusicPlugin.FOLDER + File.separator + "yt-dlp" + (os.contains("win") ? ".exe" : "");
     public YoutubeExecutor() {
     }
@@ -100,6 +101,40 @@ public class YoutubeExecutor {
         try {
             Process p = Runtime.getRuntime().exec(command);
             p.waitFor();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean installFFMPEG() {
+        try {
+            URL url = new URL(FFMPEG_URL);
+            HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+
+            int responseCode = httpConn.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+
+                InputStream inputStream = httpConn.getInputStream();
+                String fileName = "ffmpeg.exe";
+                String saveFilePath = MusicPlugin.FOLDER + File.separator + fileName;
+                OutputStream outputStream = new FileOutputStream(saveFilePath);
+                byte[] buffer = new byte[4096];
+                int bytesRead = -1;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                outputStream.close();
+                inputStream.close();
+                LOG.info("File downloaded");
+            } else {
+                LOG.error("No file to download. Server replied HTTP code: " + responseCode);
+                return false;
+            }
+
+            httpConn.disconnect();
+
             return true;
         } catch (Exception e) {
             e.printStackTrace();

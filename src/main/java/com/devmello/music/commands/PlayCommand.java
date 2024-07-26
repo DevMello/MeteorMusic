@@ -37,37 +37,16 @@ public class PlayCommand extends Command {
         });
 
         builder.then(argument("url", StringArgumentType.string()).executes(context -> {
-            warning("Stopping current song");
-            //release windows file handle lock to allow deletion
-            Player.stop();
             String url = StringArgumentType.getString(context, "url");
-            LOG.info("Downloading: {}", url);
             info("Playing: " + url);
+            warning("Stopping current song");
+            YoutubeExecutor.play(url);
 
             // Asynchronous task for downloading so we don't freeze minecraft gaming experience
             //get the video ID for the thumbnail
-            LOG.info(YoutubeExecutor.extractVideoID(url));
-            MusicImage.loadImageFromID(YoutubeExecutor.extractVideoID(url));
-            Future<Boolean> future = executorService.submit(() -> YoutubeExecutor.download(url));
+//            LOG.info(YoutubeExecutor.extractVideoID(url));
+//            MusicImage.loadImageFromID(YoutubeExecutor.extractVideoID(url));
 
-            executorService.submit(() -> {
-                try {
-                    boolean success = future.get();
-                    if (success) {
-                        LOG.info("Downloaded");
-                        info("Downloaded");
-                        Player.play(MusicPlugin.MP3);
-                        LOG.info("Playing: " + MusicPlugin.MP3);
-                        info("Playing now");
-                    } else {
-                        error("Failed to download");
-                        LOG.error("Failed to download");
-                    }
-                } catch (Exception e) {
-                    error("Exception during download");
-                    LOG.error("Exception during download", e);
-                }
-            });
 
             return SINGLE_SUCCESS;
         }));

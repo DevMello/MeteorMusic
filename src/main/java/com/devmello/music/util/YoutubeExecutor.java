@@ -2,6 +2,7 @@ package com.devmello.music.util;
 
 import com.devmello.music.MusicPlugin;
 import com.devmello.music.youtube.WebUtils;
+import com.devmello.music.youtube.search.Item;
 import com.devmello.music.youtube.search.Search;
 import com.google.gson.Gson;
 import com.mojang.logging.LogUtils;
@@ -13,11 +14,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.devmello.music.util.Song.extractVideoID;
 
 public class YoutubeExecutor {
     public static final String os = System.getProperty("os.name").toLowerCase();
@@ -28,31 +26,42 @@ public class YoutubeExecutor {
     public static final String FFMPEG_URL = "https://raw.githubusercontent.com/devmello/MeteorMusic/master/utils/ffmpeg.exe";
     public static String exec = MusicPlugin.FOLDER + File.separator + "yt-dlp" + (os.contains("win") ? ".exe" : "");
     public static Search currentSearch;
-
+    public static Song currentSong;
     public YoutubeExecutor() {
     }
 
-    public static String extractVideoID(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            String query = url.getQuery();
-            if (query != null) {
-                Map<String, String> queryPairs = new HashMap<>();
-                String[] pairs = query.split("&");
-                for (String pair : pairs) {
-                    int idx = pair.indexOf("=");
-                    if (idx > 0) {
-                        queryPairs.put(pair.substring(0, idx), URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
-                    }
-                }
-                return queryPairs.get("v");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static void play(Item item) {
+        currentSong = new Song(item);
+        LOG.info("Downloading: {}", currentSong.getUrl());
+        LOG.info("Playing: {}", currentSong.getUrl());
+        currentSong.play();
+    }
+
+    public static void play(String url) {
+        Item songURL = song(extractVideoID(url));
+        if (songURL == null) {
+            LOG.error("Failed to get song");
+            return;
+        }
+        play(songURL);
+    }
+
+
+    public static Item song(String id) {
+        Search currentSearch;
+        Gson gson = new Gson();
+        currentSearch = gson.fromJson(WebUtils.visitSite("https://www.googleapis.com/youtube/v3/videos?part=snippet&id="
+            + id
+            + "key="+MusicPlugin.api_key), Search.class);
+        if (currentSearch == null) {
+            LOG.error("Failed to get song");
+            return null;
+        }
+        if (!currentSearch.getItems().isEmpty()) {
+            return currentSearch.getItems().getFirst();
         }
         return null;
     }
-
 
     public static Search search(String query){
         Search currentSearch;

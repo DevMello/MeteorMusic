@@ -1,7 +1,6 @@
 package com.devmello.music.hud;
 
-import com.devmello.music.util.YoutubeExecutor;
-import com.mojang.blaze3d.systems.RenderSystem;
+
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.settings.EnumSetting;
 import meteordevelopment.meteorclient.settings.Setting;
@@ -9,14 +8,14 @@ import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.hud.HudElement;
 
 import com.devmello.music.MusicPlugin;
-import meteordevelopment.meteorclient.systems.hud.HudElement;
+
 import meteordevelopment.meteorclient.systems.hud.HudElementInfo;
 import meteordevelopment.meteorclient.systems.hud.HudRenderer;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.TextureManager;
+
 import net.minecraft.util.Identifier;
 
 import javax.imageio.ImageIO;
@@ -43,12 +42,6 @@ public class MusicImage extends HudElement {
 
     public MusicImage() {
         super(INFO);
-    }
-
-
-
-    public static void loadImageFromID(String id) {
-        loadImageFromUrl("https://i.ytimg.com/vi/" + id + "/hqdefault.jpg");
     }
 
     public static void loadImageFromUrl(String urlString) {
@@ -85,7 +78,6 @@ public class MusicImage extends HudElement {
     public void render(HudRenderer renderer) {
         setSize(imageSize.get().width, imageSize.get().height);
         if (MinecraftClient.getInstance().getTextureManager().getTexture(textureId) == null) return;
-        //renderer.texture(textureId, x, y, imageSize.get().width, imageSize.get().height, Color.WHITE);
         renderer.texture(textureId, x, y, getWidth(), getHeight(), Color.WHITE);
     }
 

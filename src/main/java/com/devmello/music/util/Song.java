@@ -1,9 +1,19 @@
 package com.devmello.music.util;
 
+import com.devmello.music.MusicPlugin;
+import com.devmello.music.hud.MusicImage;
+import com.devmello.music.player.Player;
+import com.devmello.music.youtube.search.Item;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
+
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Song {
     public String title;
@@ -11,13 +21,16 @@ public class Song {
     public String url;
     public String thumbnail;
     public String id;
+    public static final Logger LOG = LogUtils.getLogger();
+    //we only need one thread to download and play music
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-    public Song(String title, String artist, String url, String thumbnail, String id) {
-        this.title = title;
-        this.artist = artist;
-        this.url = url;
-        this.thumbnail = thumbnail;
-        this.id = id;
+    public Song(Item item) {
+        this.title = item.getSnippet().getTitle();
+        this.artist = item.getSnippet().getChannelTitle();
+        this.url = "https://www.youtube.com/watch?v=" + item.getId().getVideoId();
+        this.thumbnail = item.getSnippet().getThumbnails().getHigh().getUrl();
+        this.id = item.getId().getVideoId();
     }
 
     public String getTitle() {
@@ -59,6 +72,32 @@ public class Song {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String toString() {
+        return title + " - " + artist;
+    }
+
+    public void play() {
+        //release windows file handle lock to allow deletion
+        Player.stop();
+        Future<Boolean> future = executorService.submit(() -> YoutubeExecutor.download(url));
+        MusicImage.loadImageFromUrl(thumbnail);
+        executorService.submit(() -> {
+            try {
+                boolean success = future.get();
+                if (success) {
+                    LOG.info("Downloaded");
+                    Player.play(MusicPlugin.MP3);
+                    LOG.info("Playing: {}", MusicPlugin.MP3);
+
+                } else {
+                    LOG.error("Failed to download");
+                }
+            } catch (Exception e) {
+                LOG.error("Exception during download", e);
+            }
+        });
     }
 
 }

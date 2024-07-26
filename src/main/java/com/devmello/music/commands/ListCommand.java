@@ -49,33 +49,34 @@ public class ListCommand extends Command {
             }
             warning("Stopping current song");
             //release windows file handle lock to allow deletion
-            Player.stop();
-            String url = "https://www.youtube.com/watch?v=" + search.getItems().get(number).getId().getVideoId();
-            MusicImage.loadImageFromUrl(search.getItems().get(number).getSnippet().getThumbnails().getHigh().getUrl());
-            LOG.info(search.getItems().get(number).getSnippet().getThumbnails().getHigh().getUrl());
-
-            LOG.info("Playing: {}", url);
-            info("Playing: " + url);
-            Future<Boolean> future = executorService.submit(() -> YoutubeExecutor.download(url));
-
-            executorService.submit(() -> {
-                try {
-                    boolean success = future.get();
-                    if (success) {
-                        LOG.info("Downloaded");
-                        info("Downloaded");
-                        Player.play(MusicPlugin.MP3);
-                        LOG.info("Playing: " + MusicPlugin.MP3);
-                        info("Playing now");
-                    } else {
-                        error("Failed to download");
-                        LOG.error("Failed to download");
-                    }
-                } catch (Exception e) {
-                    error("Exception during download");
-                    LOG.error("Exception during download", e);
-                }
-            });
+            YoutubeExecutor.play(search.getItems().get(number));
+//            Player.stop();
+//            String url = "https://www.youtube.com/watch?v=" + search.getItems().get(number).getId().getVideoId();
+//            MusicImage.loadImageFromUrl(search.getItems().get(number).getSnippet().getThumbnails().getHigh().getUrl());
+//            LOG.info(search.getItems().get(number).getSnippet().getThumbnails().getHigh().getUrl());
+//
+//            LOG.info("Playing: {}", url);
+//            info("Playing: " + url);
+//            Future<Boolean> future = executorService.submit(() -> YoutubeExecutor.download(url));
+//
+//            executorService.submit(() -> {
+//                try {
+//                    boolean success = future.get();
+//                    if (success) {
+//                        LOG.info("Downloaded");
+//                        info("Downloaded");
+//                        Player.play(MusicPlugin.MP3);
+//                        LOG.info("Playing: " + MusicPlugin.MP3);
+//                        info("Playing now");
+//                    } else {
+//                        error("Failed to download");
+//                        LOG.error("Failed to download");
+//                    }
+//                } catch (Exception e) {
+//                    error("Exception during download");
+//                    LOG.error("Exception during download", e);
+//                }
+//            });
             return SINGLE_SUCCESS;
         }));
     }

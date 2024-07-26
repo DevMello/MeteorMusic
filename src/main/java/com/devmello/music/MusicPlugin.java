@@ -2,6 +2,7 @@ package com.devmello.music;
 
 import com.devmello.music.commands.*;
 import com.devmello.music.hud.HudExample;
+import com.devmello.music.hud.MusicImage;
 import com.devmello.music.modules.ModuleExample;
 import com.devmello.music.util.YoutubeExecutor;
 import com.mojang.logging.LogUtils;
@@ -25,7 +26,7 @@ import java.io.InputStreamReader;
 public class MusicPlugin extends MeteorAddon {
     public static final Logger LOG = LogUtils.getLogger();
     public static final Category CATEGORY = new Category("Example");
-    public static final HudGroup HUD_GROUP = new HudGroup("Example");
+    public static final HudGroup HUD_GROUP = new HudGroup("Music");
     public static final String api_key = "AIzaSyBNpjmwdyPybDRJS0YceMc2tcuxgXoF_Bc";
     public static final File FOLDER = new File(MeteorClient.FOLDER, "music");
     public static final String MP3 = "file:///" + MusicPlugin.FOLDER + "\\music.mp3";
@@ -62,6 +63,7 @@ public class MusicPlugin extends MeteorAddon {
 
         // HUD
         Hud.get().register(HudExample.INFO);
+        Hud.get().register(MusicImage.INFO);
 
         //TAB TEST
         Tabs.add(new MusicTab());

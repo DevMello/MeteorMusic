@@ -1,6 +1,9 @@
 package com.devmello.music.util;
 
 import com.devmello.music.MusicPlugin;
+import com.devmello.music.youtube.WebUtils;
+import com.devmello.music.youtube.search.Search;
+import com.google.gson.Gson;
 import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
 
@@ -19,10 +22,18 @@ public class YoutubeExecutor {
     public static final String MAC_URL = "https://github.com/yt-dlp/yt-dlp/releases/download/2024.07.25/yt-dlp_macos";
     public static final String FFMPEG_URL = "https://raw.githubusercontent.com/devmello/MeteorMusic/master/utils/ffmpeg.exe";
     public static String exec = MusicPlugin.FOLDER + File.separator + "yt-dlp" + (os.contains("win") ? ".exe" : "");
+    private Search currentSearch;
+
     public YoutubeExecutor() {
     }
 
 
+    public void makeSearch(String query){
+        Gson gson = new Gson();
+        this.currentSearch = gson.fromJson(WebUtils.visitSite("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q="
+            + query.replace(" ", "%20")
+            + "&type=video&key="+MusicPlugin.api_key), Search.class);
+    }
 
     public static boolean download(String url) {
         //\yt-dlp.exe -x --audio-format mp3 --force-overwrites -o "music.%(ext)s" url

@@ -11,21 +11,31 @@ jobs:
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
+
             - name: Wrapper Validation
               uses: gradle/actions/wrapper-validation@v3
+
             - name: Set up Java
               uses: actions/setup-java@v4
               with:
                   java-version: 21
                   distribution: adopt
+
             - name: Build with Gradle
               run: ./gradlew build
+
+            - name: Extract Version Number
+              id: extract_version
+              run: |
+                  version=$(grep 'mod_version' gradle.properties | cut -d'=' -f2 | tr -d ' ')
+                  echo "MOD_VERSION=${version}" >> $GITHUB_ENV
+
             - name: Release
               uses: marvinpinto/action-automatic-releases@latest
               with:
                   repo_token: '${{ secrets.GITHUB_TOKEN }}'
                   automatic_release_tag: latest
                   prerelease: false
-                  title: Production Build
+                  title: Build ${{ env.MOD_VERSION }} (Production)
                   files: |
                       ./build/libs/*.jar

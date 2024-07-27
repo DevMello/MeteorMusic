@@ -39,7 +39,9 @@ public class PlayCommand extends Command {
         builder.then(argument("url", StringArgumentType.string()).executes(context -> {
             String url = StringArgumentType.getString(context, "url");
             info("Playing: " + url);
-            warning("Stopping current song");
+            warning("Going to stop playing current song (if success)");
+            //release windows file handle lock to allow deletion
+            Player.stop();
             YoutubeExecutor.play(url);
 
             // Asynchronous task for downloading so we don't freeze minecraft gaming experience

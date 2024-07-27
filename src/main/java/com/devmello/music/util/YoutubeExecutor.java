@@ -48,11 +48,12 @@ public class YoutubeExecutor {
 
 
     public static Item song(String id) {
-        Search currentSearch;
+        LOG.info("Getting song: {}", id);
+        com.devmello.music.youtube.search.Song currentSearch;
         Gson gson = new Gson();
         currentSearch = gson.fromJson(WebUtils.visitSite("https://www.googleapis.com/youtube/v3/videos?part=snippet&id="
             + id
-            + "key="+MusicPlugin.api_key), Search.class);
+            + "&key="+MusicPlugin.api_key), com.devmello.music.youtube.search.Song.class);
         if (currentSearch == null) {
             LOG.error("Failed to get song");
             return null;

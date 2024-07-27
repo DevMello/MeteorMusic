@@ -16,8 +16,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class Song {
-    public String title;
-    public String artist;
+    public String title = "";
+    public String artist = "";
     public String url;
     public String thumbnail;
     public String id;
@@ -79,8 +79,7 @@ public class Song {
     }
 
     public void play() {
-        //release windows file handle lock to allow deletion
-        Player.stop();
+
         Future<Boolean> future = executorService.submit(() -> YoutubeExecutor.download(url));
         MusicImage.loadImageFromUrl(thumbnail);
         executorService.submit(() -> {
@@ -90,7 +89,6 @@ public class Song {
                     LOG.info("Downloaded");
                     Player.play(MusicPlugin.MP3);
                     LOG.info("Playing: {}", MusicPlugin.MP3);
-
                 } else {
                     LOG.error("Failed to download");
                 }

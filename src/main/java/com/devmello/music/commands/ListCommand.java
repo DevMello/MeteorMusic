@@ -49,6 +49,7 @@ public class ListCommand extends Command {
             }
             warning("Stopping current song");
             //release windows file handle lock to allow deletion
+            Player.stop();
             YoutubeExecutor.play(search.getItems().get(number));
 //            Player.stop();
 //            String url = "https://www.youtube.com/watch?v=" + search.getItems().get(number).getId().getVideoId();

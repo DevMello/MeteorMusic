@@ -21,6 +21,12 @@ public class MusicText extends HudElement {
     @Override
     public void render(HudRenderer renderer) {
         if (YoutubeExecutor.currentSong == null) return;
+        if (isInEditor()) {
+            setSize(renderer.textWidth("Current Song"), renderer.textHeight());
+            renderer.text("Current Song", x, y, Color.WHITE, false);
+            return;
+        }
+
         setSize(renderer.textWidth(YoutubeExecutor.currentSong.toString()), renderer.textHeight());
         renderer.text(YoutubeExecutor.currentSong.toString(), x, y, Color.WHITE, false);
     }

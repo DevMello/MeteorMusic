@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.devmello.music.util.Song.extractVideoID;
 
@@ -25,44 +27,30 @@ public class YoutubeExecutor {
     public static final String MAC_URL = "https://github.com/yt-dlp/yt-dlp/releases/download/2024.07.25/yt-dlp_macos";
     public static final String FFMPEG_URL = "https://raw.githubusercontent.com/devmello/MeteorMusic/master/utils/ffmpeg.exe";
     public static String exec = MusicPlugin.FOLDER + File.separator + "yt-dlp" + (os.contains("win") ? ".exe" : "");
+    public static final ExecutorService executorService = Executors.newFixedThreadPool(2);
     public static Search currentSearch;
     public static Song currentSong;
     public YoutubeExecutor() {
     }
 
     public static void play(Item item) {
+        //TODO: check if the current video is already downloaded and play it instead of downloading it again
         currentSong = new Song(item);
-        LOG.info("Downloading: {}", currentSong.getUrl());
-        LOG.info("Playing: {}", currentSong.getUrl());
-        currentSong.play();
+        play();
     }
 
     public static void play(String url) {
-        Item songURL = song(extractVideoID(url));
-        if (songURL == null) {
-            LOG.error("Failed to get song");
-            return;
-        }
-        play(songURL);
+        //TODO: check if the current video is already downloaded and play it instead of downloading it again
+        currentSong = new Song("Unknown", "Unknown", url);
+        play();
     }
 
-
-    public static Item song(String id) {
-        LOG.info("Getting song: {}", id);
-        com.devmello.music.youtube.search.Song currentSearch;
-        Gson gson = new Gson();
-        currentSearch = gson.fromJson(WebUtils.visitSite("https://www.googleapis.com/youtube/v3/videos?part=snippet&id="
-            + id
-            + "&key="+MusicPlugin.api_key), com.devmello.music.youtube.search.Song.class);
-        if (currentSearch == null) {
-            LOG.error("Failed to get song");
-            return null;
-        }
-        if (!currentSearch.getItems().isEmpty()) {
-            return currentSearch.getItems().getFirst();
-        }
-        return null;
+    public static void play() {
+        LOG.info("Downloading: {}", currentSong.getUrl());
+        currentSong.play();
     }
+
+    //TODO: implement a garbage collector to delete old songs and save space
 
     public static Search search(String query){
         Search currentSearch;
@@ -80,6 +68,7 @@ public class YoutubeExecutor {
 
     public static boolean download(String url) {
         //\yt-dlp.exe -x --audio-format mp3 --force-overwrites -o "music.%(ext)s" url
+        //TODO: instead of music.mp3, use the video ID as the name of the file
         String command = exec + " -x --audio-format mp3 --force-overwrites -o \"" + MusicPlugin.FOLDER + File.separator + "music.%(ext)s\" " + url;
         LOG.info("Command: " + command);
         try {

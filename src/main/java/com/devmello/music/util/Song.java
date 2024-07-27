@@ -23,7 +23,11 @@ public class Song {
     public String id;
     public static final Logger LOG = LogUtils.getLogger();
     //we only need one thread to download and play music
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(1);
+
+
+    public static String extractThumbnail(String url) {
+        return "https://img.youtube.com/vi/" + extractVideoID(url) + "/hqdefault.jpg";
+    }
 
     public Song(Item item) {
         this.title = item.getSnippet().getTitle();
@@ -31,6 +35,14 @@ public class Song {
         this.url = "https://www.youtube.com/watch?v=" + item.getId().getVideoId();
         this.thumbnail = item.getSnippet().getThumbnails().getHigh().getUrl();
         this.id = item.getId().getVideoId();
+    }
+
+    public Song(String title, String artist, String url) {
+        this.title = title;
+        this.artist = artist;
+        this.url = url;
+        this.thumbnail = extractThumbnail(url);
+        this.id = extractVideoID(url);
     }
 
     public String getTitle() {
@@ -79,14 +91,16 @@ public class Song {
     }
 
     public void play() {
+        //TODO: use custom IDs for the saved audio files instead of the default "music.mp3"
 
-        Future<Boolean> future = executorService.submit(() -> YoutubeExecutor.download(url));
+        Future<Boolean> future = YoutubeExecutor.executorService.submit(() -> YoutubeExecutor.download(url));
         MusicImage.loadImageFromUrl(thumbnail);
-        executorService.submit(() -> {
+        YoutubeExecutor.executorService.submit(() -> {
             try {
                 boolean success = future.get();
                 if (success) {
                     LOG.info("Downloaded");
+                    //Player.play(MusicPlugin.MP3.replace("music", id));
                     Player.play(MusicPlugin.MP3);
                     LOG.info("Playing: {}", MusicPlugin.MP3);
                 } else {

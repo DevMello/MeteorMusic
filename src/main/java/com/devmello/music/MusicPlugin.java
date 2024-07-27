@@ -2,6 +2,7 @@ package com.devmello.music;
 
 import com.devmello.music.commands.*;
 import com.devmello.music.hud.MusicImage;
+import com.devmello.music.hud.MusicText;
 import com.devmello.music.util.YoutubeExecutor;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.MeteorClient;
@@ -63,7 +64,7 @@ public class MusicPlugin extends MeteorAddon {
 
         // HUD
         Hud.get().register(MusicImage.INFO);
-
+        Hud.get().register(MusicText.INFO);
         //TAB TEST
         Tabs.add(new MusicTab());
     }

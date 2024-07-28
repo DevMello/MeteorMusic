@@ -8,14 +8,12 @@ import com.google.gson.Gson;
 import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 
 import static com.devmello.music.util.Song.extractVideoID;
 
@@ -30,7 +28,20 @@ public class YoutubeExecutor {
     public static final ExecutorService executorService = Executors.newFixedThreadPool(2);
     public static Search currentSearch;
     public static Song currentSong;
-    public YoutubeExecutor() {
+
+
+    public YoutubeExecutor() {}
+
+    public static boolean init() {
+        if (!initYTDL()) {
+            LOG.error("Failed to initialize yt-dlp.");
+            return false;
+        }
+        if (!initFFMPEG()) {
+            LOG.error("Failed to initialize ffmpeg.");
+            return false;
+        }
+        return true;
     }
 
     public static void play(Item item) {
@@ -178,4 +189,79 @@ public class YoutubeExecutor {
             return false;
         }
     }
+
+    public static boolean initFFMPEG() {
+        if (YoutubeExecutor.os.contains("win")) {
+            if (!new File(MusicPlugin.FOLDER, "ffmpeg.exe").exists()) {
+                LOG.warn("ffmpeg not installed, installing...");
+                if (YoutubeExecutor.installFFMPEG()) {
+                    LOG.info("ffmpeg installed.");
+                    return true;
+                } else {
+                    LOG.error("Failed to install ffmpeg.");
+                    return false;
+                }
+            } else {
+                LOG.info("ffmpeg is installed.");
+                return true;
+            }
+        } else {
+            String command = "ffmpeg -version";
+            ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
+            processBuilder.redirectErrorStream(true);
+            try {
+                Process process = processBuilder.start();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    LOG.info(line);
+                }
+
+                int exitCode = process.waitFor();
+                if (exitCode == 0) {
+                    LOG.info("ffmpeg is installed.");
+                    return true;
+                } else {
+                    LOG.error("ffmpeg is not installed, install it yourself.");
+                    return false;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                LOG.error("Failed to check ffmpeg installation.");
+                return false;
+            }
+        }
+    }
+
+    public static boolean initYTDL(){
+        if (YoutubeExecutor.checkInstall()) {
+            LOG.info("yt-dlp installation found.");
+            LOG.info("Attempting to update yt-dlp.");
+            if (YoutubeExecutor.update()) {
+                LOG.info("yt-dlp updated.");
+                return true;
+            } else {
+                LOG.error("Failed to update yt-dlp.");
+                return false;
+            }
+        } else {
+            LOG.warn("yt-dlp not installed, installing...");
+            if (YoutubeExecutor.install()) {
+                LOG.info("yt-dlp installed.");
+                LOG.info("Attempting to update yt-dlp.");
+                if (YoutubeExecutor.update()) {
+                    LOG.info("yt-dlp updated.");
+                } else {
+                    LOG.error("Failed to update yt-dlp.");
+                }
+                return true;
+            } else {
+                LOG.error("Failed to install yt-dlp.");
+                return false;
+            }
+        }
+    }
+
+
 }

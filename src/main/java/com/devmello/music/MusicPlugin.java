@@ -3,6 +3,7 @@ package com.devmello.music;
 import com.devmello.music.commands.*;
 import com.devmello.music.hud.MusicImage;
 import com.devmello.music.hud.MusicText;
+import com.devmello.music.util.Secrets;
 import com.devmello.music.util.YoutubeExecutor;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.MeteorClient;
@@ -26,7 +27,7 @@ public class MusicPlugin extends MeteorAddon {
     public static final Logger LOG = LogUtils.getLogger();
     public static final Category CATEGORY = new Category("Example");
     public static final HudGroup HUD_GROUP = new HudGroup("Music");
-    public static final String api_key = "AIzaSyBNpjmwdyPybDRJS0YceMc2tcuxgXoF_Bc";
+    public static String api_key = "AIzaSyBNpjmwdyPybDRJS0YceMc2tcuxgXoF_Bc";
     public static final File FOLDER = new File(MeteorClient.FOLDER, "music");
     public static final String MP3 = "file:///" + MusicPlugin.FOLDER + "\\music.mp3";
     @Override
@@ -38,13 +39,12 @@ public class MusicPlugin extends MeteorAddon {
             return;
         }
 
-        if(initFFMPEG() && initYTDL()) {
-            LOG.info("Initialization complete.");
-        } else {
-            LOG.error("Initialization failed.");
+        loadAPIs();
+
+        if (!YoutubeExecutor.init()) {
+            LOG.error("Failed to initialize YoutubeExecutor.");
             return;
         }
-
 
         // Modules
 //        Modules.get().add(new ModuleExample());
@@ -79,79 +79,6 @@ public class MusicPlugin extends MeteorAddon {
         return new GithubRepo("DevMello", "MeteorMusic");
     }
 
-    public boolean initYTDL(){
-        if (YoutubeExecutor.checkInstall()) {
-            LOG.info("yt-dlp installation found.");
-            LOG.info("Attempting to update yt-dlp.");
-            if (YoutubeExecutor.update()) {
-                LOG.info("yt-dlp updated.");
-                return true;
-            } else {
-                LOG.error("Failed to update yt-dlp.");
-                return false;
-            }
-        } else {
-            LOG.warn("yt-dlp not installed, installing...");
-            if (YoutubeExecutor.install()) {
-                LOG.info("yt-dlp installed.");
-                LOG.info("Attempting to update yt-dlp.");
-                if (YoutubeExecutor.update()) {
-                    LOG.info("yt-dlp updated.");
-                } else {
-                    LOG.error("Failed to update yt-dlp.");
-                }
-                return true;
-            } else {
-                LOG.error("Failed to install yt-dlp.");
-                return false;
-            }
-        }
-    }
-
-    public boolean initFFMPEG() {
-        if (YoutubeExecutor.os.contains("win")) {
-            if (!new File(MusicPlugin.FOLDER, "ffmpeg.exe").exists()) {
-                LOG.warn("ffmpeg not installed, installing...");
-                if (YoutubeExecutor.installFFMPEG()) {
-                    LOG.info("ffmpeg installed.");
-                    return true;
-                } else {
-                    LOG.error("Failed to install ffmpeg.");
-                    return false;
-                }
-            } else {
-                LOG.info("ffmpeg is installed.");
-                return true;
-            }
-        } else {
-            String command = "ffmpeg -version";
-            ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
-            processBuilder.redirectErrorStream(true);
-            try {
-                Process process = processBuilder.start();
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    LOG.info(line);
-                }
-
-                int exitCode = process.waitFor();
-                if (exitCode == 0) {
-                    LOG.info("ffmpeg is installed.");
-                    return true;
-                } else {
-                    LOG.error("ffmpeg is not installed, install it yourself.");
-                    return false;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                LOG.error("Failed to check ffmpeg installation.");
-                return false;
-            }
-        }
-    }
-
     public boolean folderCheck() {
         if (!MusicPlugin.FOLDER.exists()) {
             LOG.warn("Plugin folder does not exist, creating...");
@@ -160,9 +87,26 @@ public class MusicPlugin extends MeteorAddon {
                 return false;
             } else {
                 LOG.info("Plugin folder created.");
-                return true;
             }
         }
-        return MusicPlugin.FOLDER.exists();
+        if (!Secrets.exists()) {
+            LOG.warn("Secrets file does not exist, creating...");
+            if (!Secrets.create()) {
+                LOG.error("Failed to create secrets file.");
+                return false;
+            } else {
+                LOG.info("Secrets file created.");
+            }
+        }
+        return MusicPlugin.FOLDER.exists() && Secrets.exists() && Secrets.load();
+    }
+
+    public static void loadAPIs() {
+        if (Secrets.get("youtube") == null) {
+            LOG.warn("Youtube API key not found in secrets file.");
+        } else {
+            api_key = Secrets.get("youtube");
+            LOG.info("Youtube API key loaded.");
+        }
     }
 }

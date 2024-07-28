@@ -31,7 +31,7 @@ public class PlayCommand extends Command {
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
             info("Playing");
-            Player.play("file:///" + MusicPlugin.FOLDER + "\\music.mp3");
+            Player.play("file:///" + MusicPlugin.FOLDER + "\\musicfile.mp3");
             info("Playing now");
             return SINGLE_SUCCESS;
         });
@@ -40,17 +40,7 @@ public class PlayCommand extends Command {
             String url = StringArgumentType.getString(context, "url");
             info("Playing: " + url);
             warning("Going to stop playing current song (if success)");
-            //TODO: Fix this file handle bullshit with ID system to allow multiple songs to be played in YoutubeExecutor
-            //release windows file handle lock to allow deletion
-            Player.stop();
             YoutubeExecutor.play(url);
-
-            // Asynchronous task for downloading so we don't freeze minecraft gaming experience
-            //get the video ID for the thumbnail
-//            LOG.info(YoutubeExecutor.extractVideoID(url));
-//            MusicImage.loadImageFromID(YoutubeExecutor.extractVideoID(url));
-
-
             return SINGLE_SUCCESS;
         }));
 

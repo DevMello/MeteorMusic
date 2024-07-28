@@ -1,9 +1,14 @@
 package com.devmello.music.player;
 
+import com.devmello.music.MusicPlugin;
 import com.devmello.music.player.player.MP3Player;
+import com.devmello.music.util.Song;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Player {
@@ -12,6 +17,7 @@ public class Player {
 	//public static Song currentSong;
 	public static boolean isPlaying = false;
 	//public static List<Song> currentSongList = new CopyOnWriteArrayList<Song>();
+
 	public static float vol;
 	public static boolean paused;
 	public static boolean playerStopped = true;
@@ -27,27 +33,33 @@ public class Player {
 		}
 	}
 
+
+
+    public static void play(Song song){
+        song.play();
+    }
+
+
+
 	public static void play(String url) {
 		stop();
 
-					URL u;
-					try {
-						u = new URL(url);
-						player = new MP3Player(u);
-					} catch (MalformedURLException e1) {
-					}
-
-					player.setRepeat(false);
-					//setVolume(Music.volumeControl*50);
-					new Thread() {
-						@Override
-						public void run() {
-							try {
-					player.play();
-					isPlaying = true;
-					paused = false;
-				} catch (Exception e) {
-				}
+        URL u;
+        try {
+            u = new URL(url);
+            player = new MP3Player(u);
+        } catch (MalformedURLException e1) {
+        }
+        player.setRepeat(false);
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+        player.play();
+        isPlaying = true;
+        paused = false;
+    } catch (Exception e) {
+    }
 			}
 		}.start();
 	}
@@ -57,7 +69,6 @@ public class Player {
 		stop();
 					player = new MP3Player(f);
 					player.setRepeat(false);
-					//setVolume(Music.volumeControl*50);
 					new Thread() {
 						@Override
 						public void run() {
@@ -81,28 +92,6 @@ public class Player {
 		}
 	}
 
-	/*public static void next() {
-		if (player != null) {
-			int curInd = currentSongList.indexOf(currentSong);
-			if (curInd == currentSongList.size()-1) {
-				stop();
-				return;
-			}
-			play(currentSongList, currentSongList.get(curInd+1));
-		}
-	}*/
-
-	/*public static void prev() {
-		if (player != null) {
-			int curInd = currentSongList.indexOf(currentSong);
-			if (curInd == 0) {
-				stop();
-				return;
-			}
-			play(currentSongList, currentSongList.get(curInd-1));
-		}
-	}*/
-
 	public static boolean isPlaying(){
 		return playerPlaying;
 	}
@@ -115,18 +104,15 @@ public class Player {
 		if (player != null) {
 			player.stop();
 			player = null;
-			//currentSong = null;
 			isPlaying = false;
 			paused = false;
 		}
 	}
 
-	public static void setVolume(float volume) {
-		//vol = volume;
+	public static void setVolume(int volume) {
 		if (player != null) {
-			player.setVolume((int)volume);
+			player.setVolume(volume);
 		}
 	}
-
 
 }

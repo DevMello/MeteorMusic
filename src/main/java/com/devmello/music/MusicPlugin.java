@@ -29,7 +29,7 @@ public class MusicPlugin extends MeteorAddon {
     public static final HudGroup HUD_GROUP = new HudGroup("Music");
     public static String api_key = "AIzaSyBNpjmwdyPybDRJS0YceMc2tcuxgXoF_Bc";
     public static final File FOLDER = new File(MeteorClient.FOLDER, "music");
-    public static final String MP3 = "file:///" + MusicPlugin.FOLDER + "\\music.mp3";
+    public static final String MP3 = "file:///" + MusicPlugin.FOLDER + "\\musicfile.mp3";
     @Override
     public void onInitialize() {
         LOG.info("Initializing Meteor Music Addon - DevMello");
@@ -45,7 +45,7 @@ public class MusicPlugin extends MeteorAddon {
         Commands.add(new ListCommand());
         Commands.add(new CommandExample());
         Commands.add(new SearchCommand());
-        Commands.add(new MusicCommand());
+        Commands.add(new CleanCommand());
         Commands.add(new UpdateCommand());
         Commands.add(new PlayCommand());
         Commands.add(new ResumeCommand());

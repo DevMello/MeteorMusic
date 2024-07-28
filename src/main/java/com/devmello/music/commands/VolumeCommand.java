@@ -1,6 +1,7 @@
 package com.devmello.music.commands;
 
 import com.devmello.music.player.Player;
+import com.devmello.music.util.YoutubeExecutor;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import meteordevelopment.meteorclient.commands.Command;
@@ -20,8 +21,7 @@ public class VolumeCommand extends Command {
 
         builder.then(argument("volume", IntegerArgumentType.integer(0, 100)).executes(context -> {
             int volume = IntegerArgumentType.getInteger(context, "volume");
-            //TODO: Add volume functionality to YoutubeExecutor
-            Player.setVolume(volume);
+            YoutubeExecutor.setVolume(volume);
             info("Volume set to " + volume);
             return SINGLE_SUCCESS;
         }));

@@ -28,7 +28,7 @@ public class Secrets {
 
     private static JsonObject secrets = new JsonObject();
 
-    private static File secretsFile = new File(MusicPlugin.FOLDER, "secrets.txt");
+    private static File secretsFile = new File(MusicPlugin.FOLDER, "secrets.json");
 
     public static SecretKey getKeyFromUUID() {
         byte[] keyBytes = new byte[16];

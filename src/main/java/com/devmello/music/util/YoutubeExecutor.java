@@ -1,18 +1,24 @@
 package com.devmello.music.util;
 
 import com.devmello.music.MusicPlugin;
+import com.devmello.music.player.Player;
 import com.devmello.music.youtube.WebUtils;
 import com.devmello.music.youtube.search.Item;
 import com.devmello.music.youtube.search.Search;
 import com.google.gson.Gson;
 import com.mojang.logging.LogUtils;
+import meteordevelopment.meteorclient.utils.network.MeteorExecutor;
 import org.slf4j.Logger;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 import static com.devmello.music.util.Song.extractVideoID;
@@ -26,8 +32,12 @@ public class YoutubeExecutor {
     public static final String FFMPEG_URL = "https://raw.githubusercontent.com/devmello/MeteorMusic/master/utils/ffmpeg.exe";
     public static String exec = MusicPlugin.FOLDER + File.separator + "yt-dlp" + (os.contains("win") ? ".exe" : "");
     public static final ExecutorService executorService = Executors.newFixedThreadPool(2);
+    public static List<Song> currentSongList;
+    public static int currentSongIndex;
     public static Search currentSearch;
     public static Song currentSong;
+    public static boolean cache = false;
+    public static FileCleanupScheduler cleanupScheduler = new FileCleanupScheduler();
 
 
     public YoutubeExecutor() {}
@@ -41,17 +51,29 @@ public class YoutubeExecutor {
             LOG.error("Failed to initialize ffmpeg.");
             return false;
         }
+        cleanupScheduler.startCleanupTask(MusicPlugin.FOLDER, 0, 30, TimeUnit.MINUTES);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            cleanupScheduler.shutdown();
+            MeteorExecutor.execute(new SongCleanupTask(MusicPlugin.FOLDER, true));
+        }));
         return true;
     }
 
     public static void play(Item item) {
-        //TODO: check if the current video is already downloaded and play it instead of downloading it again
+        if (currentSong != null && Objects.equals(currentSong.getId(), item.getId().getVideoId())) {
+            Player.resume();
+            return;
+        }
         currentSong = new Song(item);
         play();
     }
 
+
     public static void play(String url) {
-        //TODO: check if the current video is already downloaded and play it instead of downloading it again
+        if (currentSong != null && Objects.equals(currentSong.getUrl(), url)) {
+            Player.resume();
+            return;
+        }
         currentSong = new Song("Unknown", "Unknown", url);
         play();
     }
@@ -61,25 +83,42 @@ public class YoutubeExecutor {
         currentSong.play();
     }
 
-    //TODO: implement a garbage collector to delete old songs and save space
+    public static void clean() {
+        MeteorExecutor.execute(new SongCleanupTask(MusicPlugin.FOLDER));
+    }
 
-    //TODO: implement a way to play the next song in the queue
+    public static void next() {
+        if (currentSongList == null) return;
+        if (currentSongIndex < currentSongList.size() - 1) {
+            currentSongIndex++;
+            currentSong = currentSongList.get(currentSongIndex);
+            currentSong.play();
+        }
+    }
 
-    //TODO: implement a way to play the previous song in the queue
+    public static void prev() {
+        if (currentSongIndex > 0) {
+            currentSongIndex--;
+            currentSong = currentSongList.get(currentSongIndex);
+            currentSong.play();
+        }
+    }
 
-    //TODO: implement a way to pause the current song
+    public static void play(ArrayList<Song> playlist) {
+        currentSongList = playlist;
+        currentSongIndex = 0;
+        currentSong = currentSongList.get(currentSongIndex);
+        currentSong.play();
+    }
 
-    //TODO: implement a way to resume the current song
+    public static void pause() {Player.pause();}
 
-    //TODO: implement a way to stop the current song
+    public static void resume() {Player.resume();}
 
-    //TODO: implement a way to change the volume of the current song
+    public static void stop() {Player.stop(); currentSong = null;}
 
-    //TODO: implement a way to repeat the current song
+    public static void setVolume(int volume) {Player.setVolume(volume);}
 
-    //TODO: implement a way to shuffle the queue
-
-    //TODO: add playlist support
 
     public static Search search(String query){
         Search currentSearch;
@@ -98,7 +137,8 @@ public class YoutubeExecutor {
     public static boolean download(String url) {
         //\yt-dlp.exe -x --audio-format mp3 --force-overwrites -o "music.%(ext)s" url
         //TODO: instead of music.mp3, use the video ID as the name of the file
-        String command = exec + " -x --audio-format mp3 --force-overwrites -o \"" + MusicPlugin.FOLDER + File.separator + "music.%(ext)s\" " + url;
+        //String command = exec + " -x --audio-format mp3 --force-overwrites -o \"" + MusicPlugin.FOLDER + File.separator + "music.%(ext)s\" " + url;
+        String command = exec + " -x --audio-format mp3 --force-overwrites -o \"" + MusicPlugin.FOLDER + File.separator + extractVideoID(url) + ".%(ext)s\" " + url;
         LOG.info("Command: " + command);
         try {
             Process p = Runtime.getRuntime().exec(command);
@@ -280,6 +320,4 @@ public class YoutubeExecutor {
             }
         }
     }
-
-
 }

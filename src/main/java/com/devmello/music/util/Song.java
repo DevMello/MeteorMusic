@@ -91,8 +91,6 @@ public class Song {
     }
 
     public void play() {
-        //TODO: use custom IDs for the saved audio files instead of the default "music.mp3"
-
         Future<Boolean> future = YoutubeExecutor.executorService.submit(() -> YoutubeExecutor.download(url));
         MusicImage.loadImageFromUrl(thumbnail);
         YoutubeExecutor.executorService.submit(() -> {
@@ -100,9 +98,8 @@ public class Song {
                 boolean success = future.get();
                 if (success) {
                     LOG.info("Downloaded");
-                    //Player.play(MusicPlugin.MP3.replace("music", id));
-                    Player.play(MusicPlugin.MP3);
-                    LOG.info("Playing: {}", MusicPlugin.MP3);
+                    Player.play(MusicPlugin.MP3.replace("musicfile", id));
+                    LOG.info("Playing: {}", MusicPlugin.MP3.replace("musicfile", id));
                 } else {
                     LOG.error("Failed to download");
                 }

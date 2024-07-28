@@ -63,6 +63,24 @@ public class YoutubeExecutor {
 
     //TODO: implement a garbage collector to delete old songs and save space
 
+    //TODO: implement a way to play the next song in the queue
+
+    //TODO: implement a way to play the previous song in the queue
+
+    //TODO: implement a way to pause the current song
+
+    //TODO: implement a way to resume the current song
+
+    //TODO: implement a way to stop the current song
+
+    //TODO: implement a way to change the volume of the current song
+
+    //TODO: implement a way to repeat the current song
+
+    //TODO: implement a way to shuffle the queue
+
+    //TODO: add playlist support
+
     public static Search search(String query){
         Search currentSearch;
         Gson gson = new Gson();

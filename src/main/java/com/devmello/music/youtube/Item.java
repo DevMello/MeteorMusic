@@ -1,10 +1,9 @@
 
 package com.devmello.music.youtube;
 
-import com.devmello.music.util.Texture;
+import com.devmello.music.youtube.search.Texture;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import meteordevelopment.meteorclient.systems.accounts.TexturesJson;
 
 
 public class Item {

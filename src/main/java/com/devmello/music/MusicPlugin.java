@@ -34,17 +34,9 @@ public class MusicPlugin extends MeteorAddon {
     public void onInitialize() {
         LOG.info("Initializing Meteor Music Addon - DevMello");
 
-        if(!folderCheck()) {
-            LOG.error("Failed to create plugin folder.");
-            return;
-        }
+        if(!folderCheck() && !YoutubeExecutor.init()) return;
 
         loadAPIs();
-
-        if (!YoutubeExecutor.init()) {
-            LOG.error("Failed to initialize YoutubeExecutor.");
-            return;
-        }
 
         // Modules
 //        Modules.get().add(new ModuleExample());

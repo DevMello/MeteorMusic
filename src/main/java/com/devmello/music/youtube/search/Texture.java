@@ -1,4 +1,4 @@
-package com.devmello.music.util;
+package com.devmello.music.youtube.search;
 
 public interface Texture {
     boolean hasAlpha();

@@ -1,7 +1,6 @@
 
 package com.devmello.music.youtube.search;
 
-import com.devmello.music.util.Texture;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

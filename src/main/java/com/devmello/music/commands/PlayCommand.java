@@ -40,6 +40,7 @@ public class PlayCommand extends Command {
             String url = StringArgumentType.getString(context, "url");
             info("Playing: " + url);
             warning("Going to stop playing current song (if success)");
+            //TODO: Fix this file handle bullshit with ID system to allow multiple songs to be played in YoutubeExecutor
             //release windows file handle lock to allow deletion
             Player.stop();
             YoutubeExecutor.play(url);

@@ -20,6 +20,7 @@ public class VolumeCommand extends Command {
 
         builder.then(argument("volume", IntegerArgumentType.integer(0, 100)).executes(context -> {
             int volume = IntegerArgumentType.getInteger(context, "volume");
+            //TODO: Add volume functionality to YoutubeExecutor
             Player.setVolume(volume);
             info("Volume set to " + volume);
             return SINGLE_SUCCESS;

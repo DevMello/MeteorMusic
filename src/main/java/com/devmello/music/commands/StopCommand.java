@@ -13,6 +13,7 @@ public class StopCommand extends Command {
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
+            //TODO: Add stop functionality to YoutubeExecutor
             Player.stop();
             info("Stopped");
             return SINGLE_SUCCESS;

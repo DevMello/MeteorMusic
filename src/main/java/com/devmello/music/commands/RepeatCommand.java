@@ -18,6 +18,7 @@ public class RepeatCommand extends Command {
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(argument("repeat", BoolArgumentType.bool()).executes(context -> {
             boolean repeat = BoolArgumentType.getBool(context, "repeat");
+            //TODO: Add repeat functionality to YoutubeExecutor
             Player.player.setRepeat(repeat);
             info("Repeat set to " + repeat);
             return SINGLE_SUCCESS;

@@ -13,6 +13,7 @@ public class PauseCommand extends Command {
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
+            //TODO: Add pause functionality to YoutubeExecutor
             Player.pause();
             info("Paused");
             return SINGLE_SUCCESS;

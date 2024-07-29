@@ -5,6 +5,7 @@ import com.devmello.music.hud.MusicImage;
 import com.devmello.music.player.Player;
 import com.devmello.music.youtube.search.Item;
 import com.mojang.logging.LogUtils;
+import net.minecraft.text.Text;
 import org.slf4j.Logger;
 
 import java.net.URL;
@@ -97,13 +98,15 @@ public class Song {
             try {
                 boolean success = future.get();
                 if (success) {
+                    MusicPlugin.info("Downloaded", Text.of("Playing: " + MusicPlugin.MP3.replace("musicfile", id)));
                     LOG.info("Downloaded");
                     Player.play(MusicPlugin.MP3.replace("musicfile", id));
-                    LOG.info("Playing: {}", MusicPlugin.MP3.replace("musicfile", id));
                 } else {
+                    MusicPlugin.info("Failed to download", Text.of("Failed to download"));
                     LOG.error("Failed to download");
                 }
             } catch (Exception e) {
+                MusicPlugin.info("Exception during download", Text.of("Failed to download"));
                 LOG.error("Exception during download", e);
             }
         });

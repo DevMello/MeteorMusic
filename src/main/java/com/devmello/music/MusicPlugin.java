@@ -15,7 +15,9 @@ import meteordevelopment.meteorclient.systems.hud.HudGroup;
 import meteordevelopment.meteorclient.gui.tabs.Tabs;
 
 import meteordevelopment.meteorclient.utils.misc.Version;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import com.devmello.music.gui.MusicTab;
 
@@ -149,4 +151,19 @@ public class MusicPlugin extends MeteorAddon {
         }
     }
 
+
+    public static void info(String title, Text message) {
+        ChatUtils.forceNextPrefixClass(MusicPlugin.class);
+        ChatUtils.sendMsg(title, message);
+    }
+
+    public static void warning(String title, String message, Object... args) {
+        ChatUtils.forceNextPrefixClass(MusicPlugin.class);
+        ChatUtils.warningPrefix(title, message, args);
+    }
+
+    public static void error(String title, String message, Object... args) {
+        ChatUtils.forceNextPrefixClass(MusicPlugin.class);
+        ChatUtils.errorPrefix(title, message, args);
+    }
 }

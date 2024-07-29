@@ -14,6 +14,8 @@ import meteordevelopment.meteorclient.systems.hud.Hud;
 import meteordevelopment.meteorclient.systems.hud.HudGroup;
 import meteordevelopment.meteorclient.gui.tabs.Tabs;
 
+import meteordevelopment.meteorclient.utils.misc.Version;
+import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import com.devmello.music.gui.MusicTab;
 
@@ -24,7 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MusicPlugin extends MeteorAddon {
-    public static final String CURRENT_VERSION = "0.1.1";
+    public static Version CURRENT_VERSION;
     public static final String RELEASES_URL = "https://raw.githubusercontent.com/DevMello/MeteorMusic/main/.releases";
     public static final String UPDATE_URL = "https://github.com/DevMello/MeteorMusic/releases";
     public static final Logger LOG = LogUtils.getLogger();
@@ -32,6 +34,7 @@ public class MusicPlugin extends MeteorAddon {
     public static String api_key = "AIzaSyBNpjmwdyPybDRJS0YceMc2tcuxgXoF_Bc";
     public static final File FOLDER = new File(MeteorClient.FOLDER, "music");
     public static final String MP3 = "file:///" + MusicPlugin.FOLDER + "\\musicfile.mp3";
+
     @Override
     public void onInitialize() {
         LOG.info("Initializing Meteor Music Addon - DevMello");
@@ -40,6 +43,7 @@ public class MusicPlugin extends MeteorAddon {
         checkUpdate();
         loadAPIs();
 
+        CURRENT_VERSION = new Version(FabricLoader.getInstance().getModContainer("music").orElseThrow().getMetadata().getVersion().getFriendlyString());
 
         // Commands
         Commands.add(new ListCommand());
@@ -110,9 +114,10 @@ public class MusicPlugin extends MeteorAddon {
             if (con.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
                     String latestVersion = in.readLine().trim();
-
-                    if (!CURRENT_VERSION.equals(latestVersion)) {
-
+                    Version latest = new Version(latestVersion);
+                    LOG.info("Current version: " + CURRENT_VERSION);
+                    LOG.info("Latest version: " + latest);
+                    if (latest.isHigherThan(CURRENT_VERSION)) {
                         openWebPage(UPDATE_URL);
                     }
                 }

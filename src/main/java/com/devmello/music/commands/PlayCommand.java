@@ -19,9 +19,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class PlayCommand extends Command {
-    public static final Logger LOG = LogUtils.getLogger();
-    //we only need one thread to download and play music
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(2);
 
     public PlayCommand() {
         super("play", "Plays a Song.");

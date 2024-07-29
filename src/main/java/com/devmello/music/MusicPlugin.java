@@ -47,7 +47,6 @@ public class MusicPlugin extends MeteorAddon {
 
         // Commands
         Commands.add(new ListCommand());
-        Commands.add(new CommandExample());
         Commands.add(new SearchCommand());
         Commands.add(new CleanCommand());
         Commands.add(new UpdateCommand());

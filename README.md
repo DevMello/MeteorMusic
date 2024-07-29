@@ -2,6 +2,16 @@
 A music addon for Meteor. Allows you to play music in-game.
 Currently only works with commands like .play. Will be updated to work with the HUD.
 Only tested on windows. Mac and Linux has been implemented but not tested. If you have any issues please create an issue.
+
+## NOTICE
+This addon uses yt-dlp to download music from YouTube and uses ffmpeg to convert the music to a format that can be played in Minecraft. 
+This means that the addon will download yt-dlp and ffmpeg when you first run the addon. This may take a while depending on your internet speed.
+The addon will also update yt-dlp when you run the .update command. 
+This may also take a while depending on your internet speed. 
+The main issue is it runs commands directly in command line to use these tools. 
+This is the only way I could get it to work, but it so happens to be caught by windows defender.
+If you choose to check yourself for any malicious code, you can find the code in the YoutubeExecutor class and the MusicPlugin class.
+If you have any issues please create an issue.
 ## Features
 - Play music from YouTube.
 - Pause, resume, and stop the current song.

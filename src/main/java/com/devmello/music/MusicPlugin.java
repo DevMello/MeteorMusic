@@ -26,7 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MusicPlugin extends MeteorAddon {
-    public static Version CURRENT_VERSION;
+    public static Version CURRENT_VERSION = new Version("0.1.1");
     public static final String RELEASES_URL = "https://raw.githubusercontent.com/DevMello/MeteorMusic/main/.releases";
     public static final String UPDATE_URL = "https://github.com/DevMello/MeteorMusic/releases";
     public static final Logger LOG = LogUtils.getLogger();
@@ -42,8 +42,6 @@ public class MusicPlugin extends MeteorAddon {
         if(!folderCheck() && !YoutubeExecutor.init()) return;
         checkUpdate();
         loadAPIs();
-
-        CURRENT_VERSION = new Version(FabricLoader.getInstance().getModContainer("music-addon").orElseThrow().getMetadata().getVersion().getFriendlyString());
 
         // Commands
         Commands.add(new ListCommand());

@@ -12,27 +12,22 @@ import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.commands.Commands;
 import meteordevelopment.meteorclient.systems.hud.Hud;
 import meteordevelopment.meteorclient.systems.hud.HudGroup;
-import meteordevelopment.meteorclient.systems.modules.Category;
-import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.gui.tabs.Tabs;
 
 import org.slf4j.Logger;
 import com.devmello.music.gui.MusicTab;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Objects;
 
 public class MusicPlugin extends MeteorAddon {
     public static final String CURRENT_VERSION = "0.1.1";
     public static final String RELEASES_URL = "https://raw.githubusercontent.com/DevMello/MeteorMusic/main/.releases";
     public static final String UPDATE_URL = "https://github.com/DevMello/MeteorMusic/releases";
     public static final Logger LOG = LogUtils.getLogger();
-    public static final Category CATEGORY = new Category("Example");
     public static final HudGroup HUD_GROUP = new HudGroup("Music");
     public static String api_key = "AIzaSyBNpjmwdyPybDRJS0YceMc2tcuxgXoF_Bc";
     public static final File FOLDER = new File(MeteorClient.FOLDER, "music");
@@ -42,11 +37,9 @@ public class MusicPlugin extends MeteorAddon {
         LOG.info("Initializing Meteor Music Addon - DevMello");
 
         if(!folderCheck() && !YoutubeExecutor.init()) return;
-
+        checkUpdate();
         loadAPIs();
 
-        // Modules
-//        Modules.get().add(new ModuleExample());
 
         // Commands
         Commands.add(new ListCommand());
@@ -61,10 +54,10 @@ public class MusicPlugin extends MeteorAddon {
         Commands.add(new VolumeCommand());
         Commands.add(new RepeatCommand());
 
-        // HUD
+
         Hud.get().register(MusicImage.INFO);
         Hud.get().register(MusicText.INFO);
-        //TAB TEST
+
         Tabs.add(new MusicTab());
     }
 
@@ -109,7 +102,6 @@ public class MusicPlugin extends MeteorAddon {
     }
 
     public static void checkUpdate() {
-        // url for updates:
         try {
             URL url = new URL(RELEASES_URL);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -117,17 +109,15 @@ public class MusicPlugin extends MeteorAddon {
 
             if (con.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
-                    // Step 2: Read the first line (latest version)
                     String latestVersion = in.readLine().trim();
 
-                    // Step 3: Compare versions
                     if (!CURRENT_VERSION.equals(latestVersion)) {
-                        // Versions are different, open the update URL
+
                         openWebPage(UPDATE_URL);
                     }
                 }
             } else {
-            System.err.println("Failed to fetch the updates file: HTTP error code " + con.getResponseCode());
+            LOG.error("Failed to fetch the updates file: HTTP error code " + con.getResponseCode());
             }
         } catch (Exception e) {
             LOG.error("Failed to check for updates.");
@@ -136,14 +126,23 @@ public class MusicPlugin extends MeteorAddon {
 
     private static void openWebPage(String url) {
         try {
-            if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().browse(new URL(url).toURI());
+            String os = System.getProperty("os.name").toLowerCase();
+            String[] command;
+            if (os.contains("win")) {
+                command = new String[]{"rundll32", "url.dll,FileProtocolHandler", url};
+            } else if (os.contains("mac")) {
+                command = new String[]{"open", url};
+            } else if (os.contains("nix") || os.contains("nux")) {
+                command = new String[]{"xdg-open", url};
+            } else if (os.contains("nux")) {
+                command = new String[]{"kde-open", url};
             } else {
-                System.err.println("Desktop not supported. Cannot open web page.");
+                throw new UnsupportedOperationException("Unsupported operating system");
             }
+            Runtime.getRuntime().exec(command);
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Failed to open web page: " + e.getMessage());
+            LOG.error("Failed to open web page: " + e.getMessage());
         }
     }
 

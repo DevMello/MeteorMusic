@@ -53,7 +53,6 @@ public class MusicImage extends HudElement {
                 connection.setRequestMethod("GET");
                 connection.connect();
                 LogUtils.getLogger().info("Connected to URL");
-
                 try (InputStream inputStream = connection.getInputStream()) {
                     LogUtils.getLogger().info("loaded image from URL");
                     BufferedImage jpegImage = ImageIO.read(inputStream);
@@ -82,9 +81,12 @@ public class MusicImage extends HudElement {
     }
 
     public enum ImageSize {
-        SMALL(120, 90),
-        MEDIUM(240, 180),
-        LARGE(480, 360);
+//        SMALL(120, 90),
+//        MEDIUM(240, 180),
+//        LARGE(480, 360);
+        SMALL(100,100),
+        MEDIUM(250,250),
+        LARGE(400,400);
 
         public final int width;
         public final int height;

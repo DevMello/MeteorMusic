@@ -14,6 +14,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -139,8 +140,9 @@ public class YoutubeExecutor {
     public static boolean download(String url) {
         //\yt-dlp.exe -x --audio-format mp3 --force-overwrites -o "music.%(ext)s" url
         //String command = exec + " -x --audio-format mp3 --force-overwrites -o \"" + MusicPlugin.FOLDER + File.separator + "music.%(ext)s\" " + url;
-        String command = exec + " -x --audio-format mp3 --force-overwrites -o \"" + MusicPlugin.FOLDER + File.separator + extractVideoID(url) + ".%(ext)s\" " + url;
-        LOG.info("Command: " + command);
+//        String command = exec + " -x --audio-format mp3 --force-overwrites -o \"" + MusicPlugin.FOLDER + File.separator + extractVideoID(url) + ".%(ext)s\" " + url;
+        String[] command = {exec, "-x", "--audio-format", "mp3", "--force-overwrites", "-o", MusicPlugin.FOLDER + File.separator + extractVideoID(url) + ".%(ext)s", url};
+        LOG.info("Command: {}", Arrays.stream(command).toList() );
         try {
             Process p = Runtime.getRuntime().exec(command);
             p.waitFor();
@@ -148,7 +150,6 @@ public class YoutubeExecutor {
         } catch (Exception e) {
             LOG.error("Failed to download");
             LOG.error(e.getMessage());
-            e.printStackTrace();
         }
         return false;
     }
@@ -206,13 +207,14 @@ public class YoutubeExecutor {
 
     public static boolean update() {
         String command = exec + " -U";
+        String[] commandArray = command.split(" ");
         LOG.info("Command: " + command);
         try {
-            Process p = Runtime.getRuntime().exec(command);
+            Process p = Runtime.getRuntime().exec(commandArray);
             p.waitFor();
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage());
             return false;
         }
     }

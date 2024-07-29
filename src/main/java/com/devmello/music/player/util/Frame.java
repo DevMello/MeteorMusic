@@ -335,7 +335,6 @@ public final class Frame
 				length += 4;
 				//System.out.println("VBR:"+vbri+" Frames:"+ h_vbr_frames +" Size:"+h_vbr_bytes);
 				// TOC
-				// TODO
 			}
 		}
 		catch (ArrayIndexOutOfBoundsException e)

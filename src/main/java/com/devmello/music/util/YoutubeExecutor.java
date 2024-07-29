@@ -133,10 +133,11 @@ public class YoutubeExecutor {
         return currentSearch;
     }
 
+    //TODO: add a playlist download method
+
 
     public static boolean download(String url) {
         //\yt-dlp.exe -x --audio-format mp3 --force-overwrites -o "music.%(ext)s" url
-        //TODO: instead of music.mp3, use the video ID as the name of the file
         //String command = exec + " -x --audio-format mp3 --force-overwrites -o \"" + MusicPlugin.FOLDER + File.separator + "music.%(ext)s\" " + url;
         String command = exec + " -x --audio-format mp3 --force-overwrites -o \"" + MusicPlugin.FOLDER + File.separator + extractVideoID(url) + ".%(ext)s\" " + url;
         LOG.info("Command: " + command);

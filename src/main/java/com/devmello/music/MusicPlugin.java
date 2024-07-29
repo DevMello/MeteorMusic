@@ -43,7 +43,7 @@ public class MusicPlugin extends MeteorAddon {
         checkUpdate();
         loadAPIs();
 
-        CURRENT_VERSION = new Version(FabricLoader.getInstance().getModContainer("music").orElseThrow().getMetadata().getVersion().getFriendlyString());
+        CURRENT_VERSION = new Version(FabricLoader.getInstance().getModContainer("music-addon").orElseThrow().getMetadata().getVersion().getFriendlyString());
 
         // Commands
         Commands.add(new ListCommand());

@@ -1,5 +1,6 @@
 package com.devmello.music.commands;
 
+import com.devmello.music.MusicPlugin;
 import com.devmello.music.util.YoutubeExecutor;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.logging.LogUtils;
@@ -16,8 +17,7 @@ public class UpdateCommand extends Command {
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            //TODO: Add update functionality to MusicPlugin to check for MOD updates
-            YoutubeExecutor.initYTDL();
+            MusicPlugin.checkUpdate();
             return SINGLE_SUCCESS;
         });
     }

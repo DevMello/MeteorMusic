@@ -24,11 +24,13 @@ jobs:
             - name: Build with Gradle
               run: ./gradlew build
 
-            - name: Extract Version Number
+            - name: Extract Version Numbers
               id: extract_version
               run: |
-                  version=$(grep 'mod_version' gradle.properties | cut -d'=' -f2 | tr -d ' ')
-                  echo "MOD_VERSION=${version}" >> $GITHUB_ENV
+                  mod_version=$(grep 'mod_version' gradle.properties | cut -d'=' -f2 | tr -d ' ')
+                  minecraft_version=$(grep 'minecraft_version' gradle.properties | cut -d'=' -f2 | tr -d ' ')
+                  echo "MOD_VERSION=${mod_version}" >> $GITHUB_ENV
+                  echo "MINECRAFT_VERSION=${minecraft_version}" >> $GITHUB_ENV
 
             - name: Release
               uses: marvinpinto/action-automatic-releases@latest
@@ -36,6 +38,6 @@ jobs:
                   repo_token: '${{ secrets.GITHUB_TOKEN }}'
                   automatic_release_tag: production
                   prerelease: false
-                  title: Build ${{ env.MOD_VERSION }} (Production)
+                  title: Build ${{ env.MOD_VERSION }} (Minecraft ${{ env.MINECRAFT_VERSION }}) (Production)
                   files: |
                       ./build/libs/*.jar

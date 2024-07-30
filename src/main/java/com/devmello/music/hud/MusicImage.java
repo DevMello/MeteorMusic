@@ -81,12 +81,9 @@ public class MusicImage extends HudElement {
     }
 
     public enum ImageSize {
-//        SMALL(120, 90),
-//        MEDIUM(240, 180),
-//        LARGE(480, 360);
-        SMALL(100,100),
-        MEDIUM(250,250),
-        LARGE(400,400);
+        SMALL(120, 90),
+        MEDIUM(240, 180),
+        LARGE(480, 360);
 
         public final int width;
         public final int height;

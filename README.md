@@ -6,7 +6,8 @@ Only tested on windows. Mac and Linux has been implemented but not tested. If yo
 ## NOTICE
 This addon uses yt-dlp to download music from YouTube and uses ffmpeg to convert the music to a format that can be played in Minecraft. 
 This means that the addon will download yt-dlp and ffmpeg when you first run the addon. This may take a while depending on your internet speed.
-The addon will also update yt-dlp when you run the .update command. 
+The addon will also queue the autoupdater when you run the .update command.
+This means that the addon will download an additional jar which runs on shutdown task to update the mod JAR file.
 This may also take a while depending on your internet speed. 
 The main issue is it runs commands directly in command line to use these tools. 
 This is the only way I could get it to work, but it so happens to be caught by windows defender.
@@ -16,23 +17,36 @@ If you have any issues please create an issue.
 - Play music from YouTube.
 - Pause, resume, and stop the current song.
 - Set the volume of the current song.
+- Playlist support.
+  - skip, previous (Done)
+  - repeat, loop, and shuffle (tbd)
+- HUD Visuals
+    - Song name, artist, and thumbnail
+    - Progress bar and time remaining (tbd)
+- GUI support (tbd)
 
 ## Requirements
 - [Meteor](https://meteorclient.com/)
-- ffmpeg in the meteor-client/music folder for mac and linux 💀💀 (windows automatically installed)
-- yt-dlp. not necessary but if you have some crazy fork then just place it in the meteor-client/music folder (otherwise automatically installed and updated)
+- [ffmpeg](https://ffmpeg.org//) in the meteor-client/music folder for mac and linux 💀💀 (windows automatically installed)
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) not necessary but if you have some crazy fork then just place it in the meteor-client/music folder (otherwise automatically installed and updated)
 ## Commands
 - .play <url> - Plays a song from a URL.
 - .stop - Stops the current song.
 - .pause - Pauses the current song.
 - .resume - Resumes the current song.
 - .volume <volume> - Sets the volume of the current song.
-- .update - Updates yt-dlp.
+- .update - checks for updates.
+  - .update <boolean> - auto updates get enabled or disabled based on this setting (tbd)
+- .playlist <url> - Plays a playlist from a URL.
+- .skip - Skips the current song.
+- .previous - Plays the previous song.
+- .search <query> - Searches for a song on YouTube and returns top 10 results.
+- .select <index> - Selects a song from the search results and plays it.
 
 ## Installation
-- Download the latest release from the releases page.
-- Place the jar in the addons folder of your Meteor installation.
-- Start Meteor.
+- Download the latest release from the [production](https://github.com/DevMello/MeteorMusic/releases/tag/production) releases page.
+- Place the jar in the mods folder of your fabric Minecraft installation currently supports 1.20.6 and before if you have via version (1.21 support coming real soon)
+- Start Minecraft.
 
 ## Building
 - Clone the repository.

@@ -28,15 +28,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MusicPlugin extends MeteorAddon {
-    public static Version CURRENT_VERSION = new Version("0.1.1");
+    public static Version CURRENT_VERSION = new Version("0.2.0");
     public static final String RELEASES_URL = "https://raw.githubusercontent.com/DevMello/MeteorMusic/main/.releases";
     public static final String UPDATE_URL = "https://github.com/DevMello/MeteorMusic/releases";
+    public static boolean updateAvailable = false;
     public static final Logger LOG = LogUtils.getLogger();
     public static final HudGroup HUD_GROUP = new HudGroup("Music");
     public static String api_key = "AIzaSyBNpjmwdyPybDRJS0YceMc2tcuxgXoF_Bc";
     public static final File FOLDER = new File(MeteorClient.FOLDER, "music");
     public static final String MP3 = "file:///" + MusicPlugin.FOLDER + "\\musicfile.mp3";
-    public static final File PLAYLIST_FOLDER = new File(MusicPlugin.FOLDER, "playlist");
 
     @Override
     public void onInitialize() {
@@ -50,7 +50,7 @@ public class MusicPlugin extends MeteorAddon {
         Commands.add(new PlaylistCommand());
         Commands.add(new SkipCommand());
         Commands.add(new PreviousCommand());
-        Commands.add(new ListCommand());
+        Commands.add(new SelectCommand());
         Commands.add(new SearchCommand());
         Commands.add(new CleanCommand());
         Commands.add(new UpdateCommand());
@@ -120,6 +120,7 @@ public class MusicPlugin extends MeteorAddon {
                     Version latest = new Version(latestVersion);
                     LOG.info("Current version: " + CURRENT_VERSION);
                     LOG.info("Latest version: " + latest);
+                    updateAvailable = latest.isHigherThan(CURRENT_VERSION);
                     if (latest.isHigherThan(CURRENT_VERSION)) {
                         openWebPage(UPDATE_URL);
                     }

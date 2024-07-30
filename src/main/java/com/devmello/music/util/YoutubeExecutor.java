@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 import static com.devmello.music.util.Song.extractVideoID;
@@ -42,7 +41,6 @@ public class YoutubeExecutor {
     public static Song currentSong;
     public static FileCleanupScheduler cleanupScheduler = new FileCleanupScheduler();
     public static String JSONPlaylist = "";
-
 
     public YoutubeExecutor() {}
 
@@ -71,7 +69,6 @@ public class YoutubeExecutor {
         currentSong = new Song(item);
         play();
     }
-
 
     public static void play(String url) {
         if (currentSong != null && Objects.equals(currentSong.getUrl(), url)) {
@@ -108,13 +105,6 @@ public class YoutubeExecutor {
         }
     }
 
-    public static void play(ArrayList<Song> playlist) {
-        currentSongList = playlist;
-        currentSongIndex = 0;
-        currentSong = currentSongList.get(currentSongIndex);
-        currentSong.play();
-    }
-
     public static void pause() {Player.pause();}
 
     public static void resume() {Player.resume();}
@@ -127,7 +117,7 @@ public class YoutubeExecutor {
     public static Search search(String query){
         Search currentSearch;
         Gson gson = new Gson();
-        currentSearch = gson.fromJson(WebUtils.visitSite("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q="
+        currentSearch = gson.fromJson(WebUtils.visitSite("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q="
             + query.replace(" ", "%20")
             + "&type=video&key="+MusicPlugin.api_key), Search.class);
         currentSearch.getItems().forEach(item -> LOG.info(item.getSnippet().getTitle()));
@@ -137,35 +127,22 @@ public class YoutubeExecutor {
         return currentSearch;
     }
 
-    //TODO: add a playlist download method
     public static void playPlaylist(String playlistUrl) {
-         // You can keep this if you have other uses for it
         new Thread(() -> {
-            String command = exec + " --flat-playlist -J " + playlistUrl;
-            LOG.info("Command: {}", command);
+            String[] command = {exec, "--flat-playlist", "-J", playlistUrl};
+            LOG.info("Command: {}", Arrays.stream(command).toList());
             try {
                 Process process = Runtime.getRuntime().exec(command);
                 new Thread(() -> readStream(process.getErrorStream(), "ERROR")).start();
                 new Thread(() -> readStream(process.getInputStream(), "INFO")).start();
-                LOG.info("Waiting for process to finish...");
                 process.waitFor();
-                LOG.info("Process finished.");
-                LOG.info("Hello from youtubeexecutor {}", process.getInputStream().toString());
-
-                // Read playlist JSON output
                 String jsonOutput =  JSONPlaylist;
-
-                // Parse playlist JSON
                 JsonObject jsonObject = JsonParser.parseString(jsonOutput).getAsJsonObject();
                 JsonArray entries = jsonObject.getAsJsonArray("entries");
                 LOG.info("Playlist entries: {}", entries.size());
                 LOG.info("Playlist entries: {}", entries);
-
-                // List to hold songs
                 List<Song> songs = new ArrayList<>();
                 List<Future<Boolean>> downloadFutures = new ArrayList<>();
-
-
                 for (int i = 0; i < entries.size(); i++) {
                     JsonObject entry = entries.get(i).getAsJsonObject();
                     String videoId = entry.get("id").getAsString();
@@ -174,11 +151,8 @@ public class YoutubeExecutor {
                     LOG.info("Video ID: {}", videoId);
                     LOG.info("Title: {}", title);
                     LOG.info("Uploader: {}", uploader);
-
                     String outputFileName = String.format("%s.mp3", videoId);
                     String outputPath = MusicPlugin.FOLDER + File.separator + outputFileName;
-
-                    // Submit download task
                     Future<Boolean> downloadFuture = executorService.submit(() -> {
                         try {
                             String[] downloadCommand = {exec, "-x", "--audio-format", "mp3", "--force-overwrites", "-o", outputPath, "https://www.youtube.com/watch?v=" + videoId};
@@ -192,12 +166,9 @@ public class YoutubeExecutor {
                             return false;
                         }
                     });
-
                     downloadFutures.add(downloadFuture);
                     songs.add(new Song(title, uploader, Song.createVideoURL(videoId)));
                 }
-
-                // Wait for the first song to finish downloading and play it immediately
                 CompletableFuture<Void> firstSongPlayFuture = CompletableFuture.runAsync(() -> {
                     try {
                         if (!songs.isEmpty()) {
@@ -212,8 +183,6 @@ public class YoutubeExecutor {
                         LOG.error(e.getMessage());
                     }
                 });
-
-                // Ensure all downloads complete
                 for (Future<Boolean> future : downloadFutures) {
                     try {
                         future.get(); // Wait for completion
@@ -310,7 +279,7 @@ public class YoutubeExecutor {
                 inputStream.close();
                 LOG.info("File downloaded");
             } else {
-                LOG.error("No file to download. Server replied HTTP code: " + responseCode);
+                LOG.error("No file to download. Server replied HTTP code: {}", responseCode);
             }
             httpConn.disconnect();
             return true;
@@ -436,30 +405,6 @@ public class YoutubeExecutor {
                 LOG.error("Failed to install yt-dlp.");
                 return false;
             }
-        }
-    }
-
-    public static boolean checkPlaylistFolder() {
-        if (!MusicPlugin.PLAYLIST_FOLDER.exists()) {
-            LOG.warn("Playlist folder does not exist, creating...");
-            if (!MusicPlugin.PLAYLIST_FOLDER.mkdirs()) {
-                LOG.error("Failed to create playlist folder.");
-                return false;
-            } else {
-                LOG.info("Playlist folder created.");
-                return true;
-            }
-        }
-        else if (Objects.requireNonNull(MusicPlugin.PLAYLIST_FOLDER.listFiles()).length == 0) {
-            return true;
-        } else {
-            for (File file : Objects.requireNonNull(MusicPlugin.PLAYLIST_FOLDER.listFiles())) {
-                if (!file.delete()) {
-                    LOG.error("Failed to delete file: {}", file.getName());
-                    return false;
-                }
-            }
-            return true;
         }
     }
 

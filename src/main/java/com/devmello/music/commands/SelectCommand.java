@@ -8,8 +8,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import meteordevelopment.meteorclient.commands.Command;
 import net.minecraft.command.CommandSource;
 
-public class ListCommand extends Command {
-    public ListCommand() {
+public class SelectCommand extends Command {
+    public SelectCommand() {
         super("list", "List all songs in the queue. and play a specific song.");
     }
 

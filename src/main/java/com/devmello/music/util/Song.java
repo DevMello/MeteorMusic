@@ -22,6 +22,7 @@ public class Song {
     public String url;
     public String thumbnail;
     public String id;
+    public boolean playlist = false;
     public static final Logger LOG = LogUtils.getLogger();
     //we only need one thread to download and play music
 
@@ -44,6 +45,15 @@ public class Song {
         this.url = url;
         this.thumbnail = extractThumbnail(url);
         this.id = extractVideoID(url);
+    }
+
+    public Song(String title, String artist, String id, boolean playlist) {
+        this.title = title;
+        this.artist = artist;
+        this.url = createVideoURL(id);
+        this.thumbnail = extractThumbnail(url);
+        this.playlist = playlist;
+        this.id = id;
     }
 
     public String getTitle() {
@@ -87,29 +97,39 @@ public class Song {
         return null;
     }
 
+    public static String createVideoURL(String videoID) {
+        return "https://www.youtube.com/watch?v=" + videoID;
+    }
+
     public String toString() {
         return title + " - " + artist;
     }
 
     public void play() {
-        Future<Boolean> future = YoutubeExecutor.executorService.submit(() -> YoutubeExecutor.download(url));
-        MusicImage.loadImageFromUrl(thumbnail);
-        YoutubeExecutor.executorService.submit(() -> {
-            try {
-                boolean success = future.get();
-                if (success) {
-                    MusicPlugin.info("Downloaded", Text.of("Playing: " + MusicPlugin.MP3.replace("musicfile", id)));
-                    LOG.info("Downloaded");
-                    Player.play(MusicPlugin.MP3.replace("musicfile", id));
-                } else {
-                    MusicPlugin.info("Failed to download", Text.of("Failed to download"));
-                    LOG.error("Failed to download");
+        if (YoutubeExecutor.checkDownloaded(id)) {
+            LOG.info("Already Downloaded");
+            MusicImage.loadImageFromUrl(thumbnail);
+            Player.play(MusicPlugin.MP3.replace("musicfile", id));
+        } else {
+            Future<Boolean> future = YoutubeExecutor.executorService.submit(() -> YoutubeExecutor.download(url));
+            MusicImage.loadImageFromUrl(thumbnail);
+            YoutubeExecutor.executorService.submit(() -> {
+                try {
+                    boolean success = future.get();
+                    if (success) {
+                        MusicPlugin.info("Downloaded", Text.of("Playing: " + MusicPlugin.MP3.replace("musicfile", id)));
+                        LOG.info("Downloaded");
+                        Player.play(MusicPlugin.MP3.replace("musicfile", id));
+                    } else {
+                        MusicPlugin.info("Failed to download", Text.of("Failed to download"));
+                        LOG.error("Failed to download");
+                    }
+                } catch (Exception e) {
+                    MusicPlugin.info("Exception during download", Text.of("Failed to download"));
+                    LOG.error("Exception during download", e);
                 }
-            } catch (Exception e) {
-                MusicPlugin.info("Exception during download", Text.of("Failed to download"));
-                LOG.error("Exception during download", e);
-            }
-        });
+            });
+        }
     }
 
 }

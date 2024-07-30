@@ -6,6 +6,9 @@ import com.devmello.music.youtube.WebUtils;
 import com.devmello.music.youtube.search.Item;
 import com.devmello.music.youtube.search.Search;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.utils.network.MeteorExecutor;
 import org.slf4j.Logger;
@@ -17,12 +20,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 import static com.devmello.music.util.Song.extractVideoID;
+
 
 public class YoutubeExecutor {
     public static final String os = System.getProperty("os.name").toLowerCase();
@@ -32,13 +35,13 @@ public class YoutubeExecutor {
     public static final String MAC_URL = "https://github.com/yt-dlp/yt-dlp/releases/download/2024.07.25/yt-dlp_macos";
     public static final String FFMPEG_URL = "https://raw.githubusercontent.com/devmello/MeteorMusic/master/utils/ffmpeg.exe";
     public static String exec = MusicPlugin.FOLDER + File.separator + "yt-dlp" + (os.contains("win") ? ".exe" : "");
-    public static final ExecutorService executorService = Executors.newFixedThreadPool(2);
+    public static final ExecutorService executorService = Executors.newFixedThreadPool(50);
     public static List<Song> currentSongList;
     public static int currentSongIndex;
     public static Search currentSearch;
     public static Song currentSong;
-    public static boolean cache = false;
     public static FileCleanupScheduler cleanupScheduler = new FileCleanupScheduler();
+    public static String JSONPlaylist = "";
 
 
     public YoutubeExecutor() {}
@@ -135,6 +138,118 @@ public class YoutubeExecutor {
     }
 
     //TODO: add a playlist download method
+    public static void playPlaylist(String playlistUrl) {
+         // You can keep this if you have other uses for it
+        new Thread(() -> {
+            String command = exec + " --flat-playlist -J " + playlistUrl;
+            LOG.info("Command: {}", command);
+            try {
+                Process process = Runtime.getRuntime().exec(command);
+                new Thread(() -> readStream(process.getErrorStream(), "ERROR")).start();
+                new Thread(() -> readStream(process.getInputStream(), "INFO")).start();
+                LOG.info("Waiting for process to finish...");
+                process.waitFor();
+                LOG.info("Process finished.");
+                LOG.info("Hello from youtubeexecutor {}", process.getInputStream().toString());
+
+                // Read playlist JSON output
+                String jsonOutput =  JSONPlaylist;
+
+                // Parse playlist JSON
+                JsonObject jsonObject = JsonParser.parseString(jsonOutput).getAsJsonObject();
+                JsonArray entries = jsonObject.getAsJsonArray("entries");
+                LOG.info("Playlist entries: {}", entries.size());
+                LOG.info("Playlist entries: {}", entries);
+
+                // List to hold songs
+                List<Song> songs = new ArrayList<>();
+                List<Future<Boolean>> downloadFutures = new ArrayList<>();
+
+
+                for (int i = 0; i < entries.size(); i++) {
+                    JsonObject entry = entries.get(i).getAsJsonObject();
+                    String videoId = entry.get("id").getAsString();
+                    String title = entry.get("title").getAsString();
+                    String uploader = entry.get("uploader").getAsString();
+                    LOG.info("Video ID: {}", videoId);
+                    LOG.info("Title: {}", title);
+                    LOG.info("Uploader: {}", uploader);
+
+                    String outputFileName = String.format("%s.mp3", videoId);
+                    String outputPath = MusicPlugin.FOLDER + File.separator + outputFileName;
+
+                    // Submit download task
+                    Future<Boolean> downloadFuture = executorService.submit(() -> {
+                        try {
+                            String[] downloadCommand = {exec, "-x", "--audio-format", "mp3", "--force-overwrites", "-o", outputPath, "https://www.youtube.com/watch?v=" + videoId};
+                            LOG.info("Download Command: {}", Arrays.stream(downloadCommand).toList());
+                            Process downloadProcess = Runtime.getRuntime().exec(downloadCommand);
+                            downloadProcess.waitFor();
+                            return true;
+                        } catch (Exception e) {
+                            LOG.error("Failed to download videoId: {}", videoId);
+                            LOG.error(e.getMessage());
+                            return false;
+                        }
+                    });
+
+                    downloadFutures.add(downloadFuture);
+                    songs.add(new Song(title, uploader, Song.createVideoURL(videoId)));
+                }
+
+                // Wait for the first song to finish downloading and play it immediately
+                CompletableFuture<Void> firstSongPlayFuture = CompletableFuture.runAsync(() -> {
+                    try {
+                        if (!songs.isEmpty()) {
+                            currentSongList = songs;
+                            currentSongIndex = 0;
+                            currentSong = songs.getFirst();
+                            currentSong.play();
+                            LOG.info("Playing first song immediately.");
+                        }
+                    } catch (Exception e) {
+                        LOG.error("Failed to play the first song.");
+                        LOG.error(e.getMessage());
+                    }
+                });
+
+                // Ensure all downloads complete
+                for (Future<Boolean> future : downloadFutures) {
+                    try {
+                        future.get(); // Wait for completion
+                    } catch (Exception e) {
+                        LOG.error("Error waiting for download completion.");
+                        LOG.error(e.getMessage());
+                    }
+                }
+
+
+            } catch (Exception e) {
+                LOG.error("Failed to process playlist");
+                LOG.error(e.getMessage());
+            }
+        }).start();
+    }
+
+    private static String readStream(InputStream stream, String type) {
+        int count = 0;
+        StringBuilder output = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line);
+                count++;
+                LOG.info(line);
+            }
+            LOG.info("Read{} lines from {} stream", count, type);
+            if (type.equals("INFO")) JSONPlaylist = output.toString();
+            return output.toString();
+        } catch (Exception e) {
+            LOG.error("Error reading process stream");
+            LOG.error(e.getMessage());
+        }
+        return "";
+    }
 
 
     public static boolean download(String url) {
@@ -322,5 +437,33 @@ public class YoutubeExecutor {
                 return false;
             }
         }
+    }
+
+    public static boolean checkPlaylistFolder() {
+        if (!MusicPlugin.PLAYLIST_FOLDER.exists()) {
+            LOG.warn("Playlist folder does not exist, creating...");
+            if (!MusicPlugin.PLAYLIST_FOLDER.mkdirs()) {
+                LOG.error("Failed to create playlist folder.");
+                return false;
+            } else {
+                LOG.info("Playlist folder created.");
+                return true;
+            }
+        }
+        else if (Objects.requireNonNull(MusicPlugin.PLAYLIST_FOLDER.listFiles()).length == 0) {
+            return true;
+        } else {
+            for (File file : Objects.requireNonNull(MusicPlugin.PLAYLIST_FOLDER.listFiles())) {
+                if (!file.delete()) {
+                    LOG.error("Failed to delete file: {}", file.getName());
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    public static boolean checkDownloaded(String id) {
+        return new File(MusicPlugin.FOLDER, id + ".mp3").exists();
     }
 }

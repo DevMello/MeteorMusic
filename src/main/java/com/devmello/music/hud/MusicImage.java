@@ -29,7 +29,7 @@ import java.net.URL;
 
 public class MusicImage extends HudElement {
     public static final HudElementInfo<MusicImage> INFO = new HudElementInfo<>(MusicPlugin.HUD_GROUP, "Song Image", "The thumbnail of the song.", MusicImage::new);
-    private static final Identifier textureId = new Identifier("music", "music.png");
+    private static final Identifier textureId = Identifier.of("music", "music.png");
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 

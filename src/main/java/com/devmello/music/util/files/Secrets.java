@@ -1,4 +1,4 @@
-package com.devmello.music.util;
+package com.devmello.music.util.files;
 
 import com.devmello.music.MusicPlugin;
 import com.google.gson.Gson;

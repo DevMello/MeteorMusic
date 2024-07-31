@@ -3,7 +3,7 @@ package com.devmello.music;
 import com.devmello.music.commands.*;
 import com.devmello.music.hud.MusicImage;
 import com.devmello.music.hud.MusicText;
-import com.devmello.music.util.Secrets;
+import com.devmello.music.util.files.Secrets;
 import com.devmello.music.util.YoutubeExecutor;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.MeteorClient;
@@ -18,7 +18,6 @@ import meteordevelopment.meteorclient.utils.misc.Version;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
-import org.apache.commons.logging.Log;
 import org.slf4j.Logger;
 import com.devmello.music.gui.MusicTab;
 
@@ -55,6 +54,7 @@ public class MusicPlugin extends MeteorAddon {
         loadAPIs();
 
         // Commands
+        Commands.add(new TestScreenCommand());
         Commands.add(new PlaylistCommand());
         Commands.add(new SkipCommand());
         Commands.add(new PreviousCommand());

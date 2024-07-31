@@ -16,7 +16,9 @@ import meteordevelopment.meteorclient.gui.tabs.Tabs;
 
 import meteordevelopment.meteorclient.utils.misc.Version;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
+import org.apache.commons.logging.Log;
 import org.slf4j.Logger;
 import com.devmello.music.gui.MusicTab;
 
@@ -25,10 +27,12 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MusicPlugin extends MeteorAddon {
     public static Version CURRENT_VERSION = new Version("0.2.0");
-    public static final String RELEASES_URL = "https://raw.githubusercontent.com/DevMello/MeteorMusic/main/.releases";
+    public static final String RELEASES_URL = "https://raw.githubusercontent.com/DevMello/MeteorMusic/main/releases/gameversion.releases";
     public static final String UPDATE_URL = "https://github.com/DevMello/MeteorMusic/releases";
     public static boolean updateAvailable = false;
     public static final Logger LOG = LogUtils.getLogger();
@@ -36,13 +40,18 @@ public class MusicPlugin extends MeteorAddon {
     public static String api_key = "AIzaSyBNpjmwdyPybDRJS0YceMc2tcuxgXoF_Bc";
     public static final File FOLDER = new File(MeteorClient.FOLDER, "music");
     public static final String MP3 = "file:///" + MusicPlugin.FOLDER + "\\musicfile.mp3";
+    public static String GAME_VERSION = gameVersion(MinecraftClient.getInstance().getGameVersion());
 
     @Override
     public void onInitialize() {
         LOG.info("Initializing Meteor Music Addon - DevMello");
-
+        if (GAME_VERSION == null) {
+            LOG.error("Failed to get game version.");
+        } else {
+            checkUpdate();
+        }
         if(!folderCheck() && !YoutubeExecutor.init()) return;
-        checkUpdate();
+
         loadAPIs();
 
         // Commands
@@ -109,7 +118,7 @@ public class MusicPlugin extends MeteorAddon {
 
     public static void checkUpdate() {
         try {
-            URL url = new URL(RELEASES_URL);
+            URL url = new URL(RELEASES_URL.replace("gameversion", GAME_VERSION));
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
@@ -168,5 +177,15 @@ public class MusicPlugin extends MeteorAddon {
     public static void error(String title, String message, Object... args) {
         ChatUtils.forceNextPrefixClass(MusicPlugin.class);
         ChatUtils.errorPrefix(title, message, args);
+    }
+
+    public static String gameVersion(String version) {
+        String regex = "(\\d+\\.\\d+)";
+        Pattern pattern =  Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(version);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
     }
 }

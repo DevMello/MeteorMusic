@@ -13,7 +13,6 @@ public class UpdateCommand extends Command {
     public UpdateCommand() {
         super("update", "Updates the yt-dlp.");
     }
-    //TODO: build an autoupdater which runs at shutdown to create a thread to install the latest update if needed
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {

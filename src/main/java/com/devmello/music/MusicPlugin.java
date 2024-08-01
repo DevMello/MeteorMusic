@@ -3,7 +3,6 @@ package com.devmello.music;
 import com.devmello.music.commands.*;
 import com.devmello.music.hud.MusicImage;
 import com.devmello.music.hud.MusicText;
-import com.devmello.music.modules.ScreenModule;
 import com.devmello.music.util.files.Secrets;
 import com.devmello.music.util.YoutubeExecutor;
 import com.mojang.logging.LogUtils;
@@ -58,10 +57,8 @@ public class MusicPlugin extends MeteorAddon {
 
         loadAPIs();
 
-        Modules.get().add(new ScreenModule());
 
         // Commands
-        Commands.add(new TestScreenCommand());
         Commands.add(new PlaylistCommand());
         Commands.add(new SkipCommand());
         Commands.add(new PreviousCommand());

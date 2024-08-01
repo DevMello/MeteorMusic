@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 
 public class MusicPlugin extends MeteorAddon {
     public static MinecraftClient mc = MinecraftClient.getInstance();
-    public static Version CURRENT_VERSION = new Version("0.2.1");
+    public static Version CURRENT_VERSION = new Version("0.3.0");
     public static final String RELEASES_URL = "https://raw.githubusercontent.com/DevMello/MeteorMusic/main/releases/gameversion.releases";
     public static final String UPDATE_URL = "https://github.com/DevMello/MeteorMusic/releases";
     public static boolean updateAvailable = false;

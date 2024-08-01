@@ -18,7 +18,7 @@ public class TestScreenCommand extends Command {
         builder.executes(c -> {
             c.getCommand();
             info("Opening test screen.");
-            MinecraftClient.getInstance().setScreen(new MusicPanel());
+            mc.setScreen(MusicPanel.getInstance());
             info("Opened test screen.");
             return SINGLE_SUCCESS;
         });

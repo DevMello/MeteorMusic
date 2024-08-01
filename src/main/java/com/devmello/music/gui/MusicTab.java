@@ -43,7 +43,7 @@ public class MusicTab extends Tab {
             // New
             WHorizontalList list = add(theme.horizontalList()).expandX().widget();
 
-            WTextBox nameW = list.add(theme.textBox("", (text, c) -> c != ' ')).expandX().widget();
+            WTextBox nameW = list.add(theme.textBox("Search")).expandX().widget();
             nameW.setFocused(true);
 
             WPlus add = list.add(theme.plus()).widget();

@@ -3,6 +3,7 @@ package com.devmello.music;
 import com.devmello.music.commands.*;
 import com.devmello.music.hud.MusicImage;
 import com.devmello.music.hud.MusicText;
+import com.devmello.music.modules.ScreenModule;
 import com.devmello.music.util.files.Secrets;
 import com.devmello.music.util.YoutubeExecutor;
 import com.mojang.logging.LogUtils;
@@ -14,6 +15,8 @@ import meteordevelopment.meteorclient.systems.hud.Hud;
 import meteordevelopment.meteorclient.systems.hud.HudGroup;
 import meteordevelopment.meteorclient.gui.tabs.Tabs;
 
+import meteordevelopment.meteorclient.systems.modules.Category;
+import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.misc.Version;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.client.MinecraftClient;
@@ -30,11 +33,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MusicPlugin extends MeteorAddon {
+    public static MinecraftClient mc = MinecraftClient.getInstance();
     public static Version CURRENT_VERSION = new Version("0.2.1");
     public static final String RELEASES_URL = "https://raw.githubusercontent.com/DevMello/MeteorMusic/main/releases/gameversion.releases";
     public static final String UPDATE_URL = "https://github.com/DevMello/MeteorMusic/releases";
     public static boolean updateAvailable = false;
     public static final Logger LOG = LogUtils.getLogger();
+    public static final Category CATEGORY = new Category("Music");
     public static final HudGroup HUD_GROUP = new HudGroup("Music");
     public static String api_key = "AIzaSyBNpjmwdyPybDRJS0YceMc2tcuxgXoF_Bc";
     public static final File FOLDER = new File(MeteorClient.FOLDER, "music");
@@ -52,6 +57,8 @@ public class MusicPlugin extends MeteorAddon {
         if(!folderCheck() && !YoutubeExecutor.init()) return;
 
         loadAPIs();
+
+        Modules.get().add(new ScreenModule());
 
         // Commands
         Commands.add(new TestScreenCommand());
@@ -84,6 +91,9 @@ public class MusicPlugin extends MeteorAddon {
     public GithubRepo getRepo() {
         return new GithubRepo("DevMello", "MeteorMusic");
     }
+
+    @Override
+    public void onRegisterCategories() {Modules.registerCategory(CATEGORY);}
 
     public boolean folderCheck() {
         if (!MusicPlugin.FOLDER.exists()) {

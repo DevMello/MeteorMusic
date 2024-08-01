@@ -1,6 +1,7 @@
 package com.devmello.music.util;
 
 import com.devmello.music.MusicPlugin;
+import com.devmello.music.gui.MusicPanel;
 import com.devmello.music.player.Player;
 import com.devmello.music.util.files.FileCleanupScheduler;
 import com.devmello.music.util.files.SongCleanupTask;
@@ -113,7 +114,7 @@ public class YoutubeExecutor {
 
     public static void resume() {Player.resume();}
 
-    public static void stop() {Player.stop(); currentSong = null; MinecraftClient.getInstance().setScreen(new TitleScreen());}
+    public static void stop() {Player.stop(); currentSong = null; MinecraftClient.getInstance().setScreen(new MusicPanel());}
 
     public static void setVolume(int volume) {Player.setVolume(volume);}
 

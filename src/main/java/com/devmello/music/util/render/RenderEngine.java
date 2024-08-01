@@ -13,11 +13,29 @@ import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Range;
 import org.joml.Math;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
 import java.awt.*;
+import java.io.IOException;
+import java.util.Objects;
 
 public class RenderEngine {
+    public static FontRenderer Jello;
+    public static FontRenderer icons;
+    public static FontRenderer JelloLight;
+    public static FontRenderer COMFORTAA_SMALL;
+
+    static {
+        try {
+            Jello = new FontRenderer(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(RenderEngine.class.getClassLoader().getResourceAsStream("assets/music/fonts/jello.ttf"))).deriveFont(Font.PLAIN, 20f), 20f);
+            icons = new FontRenderer(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(RenderEngine.class.getClassLoader().getResourceAsStream("assets/music/fonts/icons.ttf"))).deriveFont(Font.PLAIN, 10), 10);
+            COMFORTAA_SMALL = new FontRenderer(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(RenderEngine.class.getClassLoader().getResourceAsStream("assets/music/fonts/comfortaa.ttf"))).deriveFont(Font.PLAIN, 7.5f), 7.5f);
+
+        } catch (FontFormatException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Reference to the minecraft client
      */
@@ -116,7 +134,7 @@ public class RenderEngine {
 
     /**
      * <p>Renders a filled ellipse</p>
-     * <p>Best used inside of {@link MSAAFramebuffer#use(int, Runnable)}</p>
+     *
      *
      * @param matrices     The context MatrixStack
      * @param ellipseColor The color of the ellipse
@@ -150,7 +168,7 @@ public class RenderEngine {
 
     /**
      * <p>Renders a filled circle</p>
-     * <p>Best used inside of {@link MSAAFramebuffer#use(int, Runnable)}</p>
+     *
      *
      * @param matrices    MatrixStack
      * @param circleColor Color of the circle
@@ -165,7 +183,7 @@ public class RenderEngine {
 
     /**
      * <p>Renders an ellipse's outline</p>
-     * <p>Best used inside of {@link MSAAFramebuffer#use(int, Runnable)}</p>
+     *
      *
      * @param matrices     MatrixStack
      * @param ellipseColor Color of the ellipse

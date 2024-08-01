@@ -38,7 +38,6 @@ public class MusicPlugin extends MeteorAddon {
     public static final String UPDATE_URL = "https://github.com/DevMello/MeteorMusic/releases";
     public static boolean updateAvailable = false;
     public static final Logger LOG = LogUtils.getLogger();
-    public static final Category CATEGORY = new Category("Music");
     public static final HudGroup HUD_GROUP = new HudGroup("Music");
     public static String api_key = "AIzaSyBNpjmwdyPybDRJS0YceMc2tcuxgXoF_Bc";
     public static final File FOLDER = new File(MeteorClient.FOLDER, "music");
@@ -88,9 +87,6 @@ public class MusicPlugin extends MeteorAddon {
     public GithubRepo getRepo() {
         return new GithubRepo("DevMello", "MeteorMusic");
     }
-
-    @Override
-    public void onRegisterCategories() {Modules.registerCategory(CATEGORY);}
 
     public boolean folderCheck() {
         if (!MusicPlugin.FOLDER.exists()) {

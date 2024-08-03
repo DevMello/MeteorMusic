@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.utils.network.MeteorExecutor;
+import net.minecraft.client.MinecraftClient;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -55,6 +56,7 @@ public class YoutubeExecutor {
         }
         cleanupScheduler.startCleanupTask(MusicPlugin.FOLDER, 0, 30, TimeUnit.MINUTES);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Player.stop();
             cleanupScheduler.shutdown();
             MeteorExecutor.execute(new SongCleanupTask(MusicPlugin.FOLDER, true));
         }));

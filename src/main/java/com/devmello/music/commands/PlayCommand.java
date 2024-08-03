@@ -26,12 +26,6 @@ public class PlayCommand extends Command {
 
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
-        builder.executes(context -> {
-            Player.play("file:///" + MusicPlugin.FOLDER + "\\musicfile.mp3");
-            info("Playing now");
-            return SINGLE_SUCCESS;
-        });
-
         builder.then(argument("url", StringArgumentType.string()).executes(context -> {
             String url = StringArgumentType.getString(context, "url");
             info("Playing: " + url);
